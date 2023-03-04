@@ -3,9 +3,14 @@ import openai
 import pprint
 import nltk
 from nltk.tokenize import word_tokenize
+import os
 
-# TEMPORARY | move this secret api key (or future ones) into a file and store it privately into the database
-openai.api_key = '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'
+'''
+Obtain a personal API key from openai
+Run this command in the terminal
+export OPENAI_API_KEY='your_openai_api_key'
+'''
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 def preprocess_text(text):
     # remove extra spaces, newlines, tabs
