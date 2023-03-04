@@ -4,6 +4,7 @@ import pprint
 import nltk
 from nltk.tokenize import word_tokenize
 import os
+import spacy
 
 '''
 Obtain a personal API key from openai
@@ -62,39 +63,35 @@ def get_token_count(text):
     # return an int
     return len(tokens)
 
-# TODO: appears to be ineffective, must redo using openai's .search for semantic search engine
-def get_document_probability(query, document_text):
+# NOTE: consider returning a list of matching documents if they are all within threshold?
+
+def get_matching_document(query, document_list):
+    error_threshold = 0.75 # similarity score threshold; subject to change
     
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=f"Is the following query:\n{query}\n\n relevant to the following text:\n{document_text}\n\n Give me a floating point between 0 (no) to 1 (yes)",
-        max_tokens=10,
+    # semantically search through all documents
+    results = openai.Completion.create(
+        engine='davinci',
+        prompt=query,
+        max_tokens = 10,
         n=1,
-        temperature = 0.5,
-        stop=None
-    )
-
-    response = response.choices[0].text
-    tokens = word_tokenize(response)
-    
-    print(tokens)
-    
-    # return the first (most probable) single token response
-    return tokens[0]
-
-''''
-def get_classifications(text):
-    response = openai.Completion.create(
-        engine="babbage",
-        prompt=f"classify the following university course syllabus:\n{text}\n\ninto categories f:",
-        max_tokens=get_token_count(text)+20,
-        n=10,
         stop=None,
-        temperature=0.5
+        temperature=0.2,
+        search_model="ada",
+        documents=document_list
     )
-    categories = response["choices"][0]["text"].strip().split("\n")
-    return categories
-'''
+    
+    print("Score: ", results.choices[0].score)
+    
+    # check the most related document against a threshold
+    if results.choices[0].score > error_threshold:
+        # match found
+        matched_doc = document_list[results.choices[0].index]
+
+        return matched_doc
+    else:
+        # no match within threshold found
+        return None
+
 
 if __name__ == '__main__':
     # debugging purposes
@@ -107,12 +104,12 @@ if __name__ == '__main__':
     print(clean_pdf_text)
     print('\n\n\n\n\n')
 
-    response = get_document_probability("anyone have tips for starting the word guessing hw?", clean_pdf_text)
+    response = get_matching_document("anyone have tips for starting the word guessing hw?", list(clean_pdf_text))
 
     print('\n\n\n')
     pprint.pprint(response)
 
-    response = get_document_probability("what are professor's office hours?", clean_pdf_text)
+    response = get_matching_document("what are professor's office hours?", list(clean_pdf_text))
 
     print('\n\n\n')
     pprint.pprint(response)
