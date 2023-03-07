@@ -99,14 +99,32 @@ def get_pdf_text_categories(pdf_path):
         for i,page in enumerate(pdf.pages):
             text = pdf.pages[i] # get one page
             
+            print(f"______________________Page {i+1} Output______________________")
+
             # get only bolded words
-            clean_text = text.filter(lambda obj: (obj['object_type'] == 'char' and 'Bold' in obj['fontname']))
-            print(clean_text.extract_text())
+            #bold_text = text.filter(lambda obj: (obj['object_type'] == 'char' and 'Bold' in obj['fontname']))
+            #print(bold_text.extract_text() + '\n')
+            
+            # get all words
+            #text = text.filter(lambda obj: (obj['object_type'] == 'char'))
+            #print(text.extract_text(use_text_flow=False) + '\n')
+            
+            # get italicized words
+            #italic_text = text.filter(lambda obj: (obj['object_type'] == 'char' and 'Italic' in obj['fontname']))
+            #print(italic_text.extract_text() + '\n')
+
+            #Check object information
+            #with open("pdf_info.txt", "a") as f:
+            #    print(text.objects, file=f)
+
+            # Extracting Information from Tables
+            tablesInfo = text.extract_tables(table_settings={})
+            print(tablesInfo)            
 
 if __name__ == '__main__':
     
     # debugging purposes
-    pdf_path = 'Syllabus-4375.pdf'
+    pdf_path = 'Syllabus-3377.pdf'
     get_pdf_text_categories(pdf_path)
     '''
     raw_pdf_text = extract_text_from_pdf(pdf_path)
