@@ -107,19 +107,24 @@ def get_pdf_text_categories(pdf_path):
             
             # get all words
             #text = text.filter(lambda obj: (obj['object_type'] == 'char'))
+            
             #print(text.extract_text(use_text_flow=False) + '\n')
             
             # get italicized words
             #italic_text = text.filter(lambda obj: (obj['object_type'] == 'char' and 'Italic' in obj['fontname']))
             #print(italic_text.extract_text() + '\n')
-
-            #Check object information
+            
+            # Save table information
             #with open("pdf_info.txt", "a") as f:
             #    print(text.objects, file=f)
 
             # Extracting Information from Tables
             tablesInfo = text.extract_tables(table_settings={})
             print(tablesInfo)            
+
+            # Save table information
+            #with open("pdf_table_info.txt", "a") as f:
+            #    print(tablesInfo, file=f)
 
 if __name__ == '__main__':
     
