@@ -56,17 +56,6 @@ def get_matching_documents(query: str, documents: list) -> list:
             
     return document_matches
     
-    '''
-    if max(similarity_scores) > error_threshold:
-        # match found
-        most_probable_index = similarity_scores.index(max(similarity_scores))
-        most_probable_document = documents[most_probable_index]
-        return most_probable_document
-    else:
-        # no match found
-        return None
-    '''
-    
 def extract_text_from_tables(docx_path: str) -> list:
     '''
     extract text from tables in a docx by row
@@ -142,6 +131,7 @@ if __name__ == '__main__':
     # print(clean_query)
     
     matches = get_matching_documents(query, table_documents)
+    # output top 5 matches
     for i, match in enumerate(matches[:5]):
         print(str(i) + ': ' + match + '\n')
     
