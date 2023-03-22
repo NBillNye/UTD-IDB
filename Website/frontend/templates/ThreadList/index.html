@@ -1,0 +1,61 @@
+{% extends 'Shared/SharedView.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+</head>
+<body>
+    <div>
+        <div class="ui orange inverted menu">
+            <div class="ui container">
+                <div class="item">
+                    <div class="ui icon input">
+                        <input class="prompt" type="text" placeholder="Search...">
+                        <i class="search icon"></i>
+                    </div>
+                </div>
+                <div class="right menu">
+                    <div class="item">
+                        <button class="ui orange button">Add Thread</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="ui container">
+        <div class="ui divided items">
+            <div class="item thread-item">
+                <div class="content">
+                    <a class="header">Thread Title</a>
+                    <span class="date">(01/01/2023)</span>
+                    <div class="meta">
+                        <span>John Smith</span>
+                    </div>
+                    <div class="description">
+                        <p>This is the thread description.</p>
+                    </div>
+                </div>
+            </div>
+            {% for thread in threads %}
+            <div class="item thread-item">
+                <div class="content">
+                    <a class="header">{{ thread.title }}</a>
+                    <div class="meta">
+                        <span>Written by {{ thread.writer }}</span>
+                    </div>
+                    <div class="description">
+                        <p>{{ thread.details|truncatewords:30 }}</p>
+                    </div>
+                </div>
+                <div class="thread-date">{{ thread.date_posted }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+</body>
+</html>
+
+{% endblock %}
