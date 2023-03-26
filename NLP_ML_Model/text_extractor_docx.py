@@ -1,9 +1,20 @@
 import nltk
+from nltk.corpus import wordnet
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import spacy
 from docx import Document
+import pickle
+import os
+
+import keyword_extraction
+import pipeline
+
+class Doc:
+    def __init__(self, text, keywords):
+        self.text = text
+        self.keywords = keywords
 
 
 stopwords = set(stopwords.words('english'))
@@ -27,9 +38,11 @@ def preprocess_text(text: str) -> str:
 
 # use spacy to compute similarity between query and each document
 def get_matching_documents(query: str, documents: list) -> list:
+    #print('Calculating similarities...')
+    
     error_threshold = 0.5 # similarity score threshold; subject to change
     
-    print(query)
+    print(f'matching func|| query: {query} , documents: {documents}')
     
     query = nlp(preprocess_text(query))
     nlp_docs = []
@@ -51,9 +64,12 @@ def get_matching_documents(query: str, documents: list) -> list:
     document_matches = []
     for doc, score in sorted_docs_by_score:
         if score > error_threshold:
-            # match found
-            document_matches.append(doc)
-            
+            if doc not in document_matches:
+                # match found
+                print(f'Score: {score}')
+                document_matches.append(doc)
+    #print('Done calculating similarities.')
+    
     return document_matches
     
 def extract_text_from_tables(docx_path: str) -> list:
@@ -61,6 +77,7 @@ def extract_text_from_tables(docx_path: str) -> list:
     extract text from tables in a docx by row
     everything within the same row is put into the same document
     '''
+    #print('Extracting text from tables...')
     
     docx = Document(docx_path)
     table_documents = []
@@ -68,8 +85,10 @@ def extract_text_from_tables(docx_path: str) -> list:
         for row in table.rows:
             row_content = ''
             for cell in row.cells:
-                row_content += cell.text
+                row_content += cell.text + ' '
             table_documents.append(row_content)
+    
+    #print('Done extracting text from tables.')
     
     return table_documents
     
@@ -95,44 +114,68 @@ def extract_text_from_bold(docx_path: str) -> list:
     
     return bolded_documents  
 
-#def extract_docx_text(docx_path: str) -> list:
+# TENTATIVE
+# How and where we save the keywords of a document may change (i.e. in database instead)
+def process_syllabus(docx_path, kw_model):
+    '''
+    Pull text in tables and organize them into a list of 'documents'
+    for each document, determine keywords for each document and save them
+    to a class containing both the text and keywords
+    finally, pickle a list of these syllabus document classes for later use
+    '''
+    #print('Processing syllabus...')
+    
+    table_documents = extract_text_from_tables(docx_path)
+    
+    docs = []
+    for document in table_documents:
+        keywords = keyword_extraction.extract_keywords(kw_model, document, ngram_range=3, top_n=10)
+        #print(keywords)
+        docs.append(Doc(document, keywords))
+    
+    with open('syllabus_docs.pickle', 'wb') as f:
+        pickle.dump(docs, f)
+    
+    #print('Done processing syllabus.')
+
+# not really sure if we need this tbh
+def get_similar_words(keyword):
+    similar_words = []
+    
+    for syn in wordnet.synsets(keyword):
+        for synonym in syn.lemmas():
+            similar_words.append(synonym.name())
+    print(f'Similar words: {set(similar_words)}')
 
 if __name__ == '__main__':
     docx_path = 'Syllabus-3377-converted.docx'
-    table_documents = extract_text_from_tables(docx_path)
-    #print(table_documents)
-    '''
-    table_doc_lemmas = []
-    for doc in table_documents:
-        table_doc_lemmas.append(preprocess_text(doc))
-    '''
+    kw_model = keyword_extraction.load()
+    query = 'what is the grading policy?' # input query
     
-    '''
-    for doc in table_doc_lemmas:
-        print(doc + '\n')
-    '''
+    # only process once
+    if not os.path.exists('syllabus_docs.pickle'):
+        kw_model = process_syllabus(docx_path, kw_model)
     
-    bolded_documents = extract_text_from_bold(docx_path)
-    #print(bolded_documents)
-    '''
-    bolded_doc_lemmas = []
-    for doc in bolded_documents:
-        bolded_doc_lemmas.append(preprocess_text(doc))
-    '''
+    with open('syllabus_docs.pickle', 'rb') as f:
+        all_docs = pickle.load(f)
+        
+        # only retrieve the documents that contain the keywords
+        only_key_docs = []
+        query_keywords = keyword_extraction.extract_keywords(kw_model, query, ngram_range=2, top_n=3)
+        for doc in all_docs:
+            for keyword in query_keywords:
+                doc_keywords = ' '.join(doc.keywords)
+                if keyword in doc_keywords:
+                    only_key_docs.append(doc_keywords)
+                    print(f'Added doc keywords: {doc_keywords}')
+
+    # map keywords to documents
+    doc_dict = {}
+    for doc in all_docs:
+        doc_dict[' '.join(doc.keywords)] = doc.text
     
-    '''
-    for doc in bolded_doc_lemmas:
-        print(doc + '\n')
-    '''
-    
-    query = 'grading policy?'
-    
-    # clean_query = preprocess_text(query)
-    # print(clean_query)
-    
-    matches = get_matching_documents(query, table_documents)
+    matches = get_matching_documents(' '.join(query_keywords), only_key_docs)
     # output top 5 matches
     for i, match in enumerate(matches[:5]):
-        print(str(i) + ': ' + match + '\n')
-    
+        print(str(i) + ': ' + doc_dict[match] + '\n')
     
