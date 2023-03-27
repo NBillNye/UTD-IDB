@@ -42,7 +42,7 @@ def get_matching_documents(query: str, documents: list) -> list:
     
     error_threshold = 0.5 # similarity score threshold; subject to change
     
-    print(f'matching func|| query: {query} , documents: {documents}')
+    #print(f'matching func|| query: {query} , documents: {documents}')
     
     query = nlp(preprocess_text(query))
     nlp_docs = []
@@ -123,7 +123,7 @@ def process_syllabus(docx_path, kw_model):
     to a class containing both the text and keywords
     finally, pickle a list of these syllabus document classes for later use
     '''
-    #print('Processing syllabus...')
+    print('Processing syllabus...')
     
     table_documents = extract_text_from_tables(docx_path)
     
@@ -168,13 +168,14 @@ if __name__ == '__main__':
                 doc_keywords = ' '.join(doc.keywords)
                 if keyword in doc_keywords:
                     only_key_docs.append(doc_keywords)
-                    print(f'Added doc keywords: {doc_keywords}')
+                    #print(f'Added doc keywords: {doc_keywords}')
 
     # map keywords to documents
     doc_dict = {}
     for doc in all_docs:
         doc_dict[' '.join(doc.keywords)] = doc.text
     
+    print(f'Transformed query: {query_keywords}') 
     matches = get_matching_documents(' '.join(query_keywords), only_key_docs)
     # output top 5 matches
     for i, match in enumerate(matches[:5]):
