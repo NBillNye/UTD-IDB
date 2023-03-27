@@ -149,12 +149,13 @@ def get_similar_words(keyword):
 
 if __name__ == '__main__':
     docx_path = 'Syllabus-3377-converted.docx'
-    kw_model = keyword_extraction.load()
     query = 'what is the grading policy?' # input query
+    
+    kw_model = keyword_extraction.load()
     
     # only process once
     if not os.path.exists('syllabus_docs.pickle'):
-        kw_model = process_syllabus(docx_path, kw_model)
+        process_syllabus(docx_path, kw_model)
     
     with open('syllabus_docs.pickle', 'rb') as f:
         all_docs = pickle.load(f)

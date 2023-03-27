@@ -1,10 +1,18 @@
 from keybert import KeyBERT
 import pickle
+import os
 
 def load():
-    with open('KeyBERT_model.pickle', 'rb') as f:
-        kw_model = pickle.load(f)
-        return kw_model
+    if os.path.exists('KeyBERT_model.pickle'):
+        print("Loading KeyBERT...")
+        with open('KeyBERT_model.pickle', 'rb') as f:
+            kw_model = pickle.load(f)
+            return kw_model
+    with open('KeyBERT_model.pickle', 'wb') as f:
+        print("Building KeyBERT...")
+        kw_model = KeyBERT(model='all-mpnet-base-v2')
+        pickle.dump(kw_model, f)
+    return kw_model
 
 def extract_keywords(kw_model, document: str, ngram_range=3, top_n=10) -> list:
     keywords = kw_model.extract_keywords(document,
