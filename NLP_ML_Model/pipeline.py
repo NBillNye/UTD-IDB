@@ -2,7 +2,7 @@ from transformers import pipeline
 
 class Pipeline:
     def __init__(self):
-        self.question_answerer = pipeline("question-answering", model='distilbert-base-uncased-distilled-squad')
+        self.question_answerer = pipeline("question-answering", model='bert-large-uncased-whole-word-masking-finetuned-squad')
     
     def get_answer(self, question: str, context: str) -> str:
         result = self.question_answerer(question=question, context=context)

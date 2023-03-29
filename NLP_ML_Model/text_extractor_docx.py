@@ -9,7 +9,7 @@ import pickle
 import os
 
 import keyword_extraction
-import pipeline
+from pipeline import *
 
 class Doc:
     def __init__(self, text, keywords):
@@ -149,7 +149,7 @@ def get_similar_words(keyword):
 
 if __name__ == '__main__':
     docx_path = 'Syllabus-3377-converted.docx'
-    query = 'what is the grading policy?' # input query
+    query = 'who is the professor?' # input query
     
     kw_model = keyword_extraction.load()
     
@@ -178,6 +178,11 @@ if __name__ == '__main__':
     print(f'Transformed query: {query_keywords}') 
     matches = get_matching_documents(' '.join(query_keywords), only_key_docs)
     # output top 5 matches
+    context = ""
     for i, match in enumerate(matches[:5]):
-        print(str(i) + ': ' + doc_dict[match] + '\n')
+        context += (doc_dict[match] + ' ')
+    
+    print("Context:\n" + context + '\n\n')
+    pipeline = Pipeline()
+    pipeline.get_answer(query, context)
     
