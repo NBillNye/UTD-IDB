@@ -21,37 +21,30 @@
         </div>
     </div>
     <br>
-    <div class="ui container">
+    <div class="ui thread container">
         <div class="ui divided items">
-            <div class="item thread-item">
-                <div class="content">
-                    <a class="header">Thread Title</a>
-                    <span class="date">(01/01/2023)</span>
-                    <div class="meta">
-                        <span>John Smith</span>
-                    </div>
-                    <div class="description">
-                        <p>This is the thread description.</p>
-                    </div>
-                </div>
-            </div>
             {% for thread in threads %}
             <div class="item thread-item">
                 <div class="content">
-                    <a class="header">{{ thread.title }}</a>
+                    <a class="header">{{ thread.Name }}</a>
+                    <span class="date"> ({{ thread.Date }})</span>
                     <div class="meta">
-                        <span>Written by {{ thread.writer }}</span>
+                        <span>Written by {{ thread.Author }}</span>
                     </div>
                     <div class="description">
-                        <p>{{ thread.details|truncatewords:30 }}</p>
+                        <p>{{ thread.Description|truncatewords:30 }}</p>
                     </div>
                 </div>
-                <div class="thread-date">{{ thread.date_posted }}</div>
             </div>
             {% endfor %}
         </div>
     </div>
 </body>
 </html>
+<style>
+    .thread {
+        cursor: pointer;
+    }
+</style>
 
 {% endblock %}
