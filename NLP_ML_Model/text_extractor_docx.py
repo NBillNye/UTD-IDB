@@ -16,6 +16,20 @@ class Doc:
         self.text = text
         self.keywords = keywords
 
+# getter and setter for inputs
+class inputs:
+    def __init__(self, docx_path, query):
+        self.docx_path = docx_path
+        self.query = query
+
+    def __init__(self):
+        return
+
+    def set_docx_path(self, docx_path):
+        self.docx_path = docx_path
+
+    def set_query(self, query):
+        self.query = query
 
 stopwords = set(stopwords.words('english'))
 nlp = spacy.load('en_core_web_lg') # py -m spacy download en_core_web_lg
@@ -116,14 +130,14 @@ def extract_text_from_bold(docx_path: str) -> list:
 
 # TENTATIVE
 # How and where we save the keywords of a document may change (i.e. in database instead)
-def process_syllabus(docx_path, kw_model):
+def process_course_material(docx_path, kw_model):
     '''
     Pull text in tables and organize them into a list of 'documents'
     for each document, determine keywords for each document and save them
     to a class containing both the text and keywords
-    finally, pickle a list of these syllabus document classes for later use
+    finally, pickle a list of these course_material document classes for later use
     '''
-    print('Processing syllabus...')
+    print('Processing course_material...')
     
     table_documents = extract_text_from_tables(docx_path)
     
@@ -133,10 +147,10 @@ def process_syllabus(docx_path, kw_model):
         #print(keywords)
         docs.append(Doc(document, keywords))
     
-    with open('syllabus_docs.pickle', 'wb') as f:
+    with open('course_material_docs.pickle', 'wb') as f:
         pickle.dump(docs, f)
     
-    #print('Done processing syllabus.')
+    #print('Done processing course_material.')
 
 # not really sure if we need this tbh
 def get_similar_words(keyword):
@@ -147,22 +161,31 @@ def get_similar_words(keyword):
             similar_words.append(synonym.name())
     print(f'Similar words: {set(similar_words)}')
 
-if __name__ == '__main__':
-    docx_path = 'Syllabus-3377-converted.docx'
-    query = 'who is the professor?' # input query
-    
-    kw_model = keyword_extraction.load()
-    
-    # only process once
-    if not os.path.exists('syllabus_docs.pickle'):
-        process_syllabus(docx_path, kw_model)
-    
-    with open('syllabus_docs.pickle', 'rb') as f:
+# Checks if docx has already been processed
+def process_docx(docx_path, kw_model):
+    if not os.path.exists('course_material_docs.pickle'):               #TODO: Make pickle file names dynamic to given docx name
+        process_course_material(docx_path, kw_model)
+
+def ask_bert(docx_path, query):
+    new_query = inputs()
+    new_query.set_docx_path(docx_path)
+    new_query.set_query(query)
+
+    ask_bert_detailed(new_query)
+
+# Takes in question and docx and outputs answer with confidence score
+def ask_bert_detailed(new_query):
+
+    kw_model = keyword_extraction.load()                                #TODO: fix kw_model needs
+
+    process_docx(new_query.docx_path, kw_model)
+
+    with open('course_material_docs.pickle', 'rb') as f:
         all_docs = pickle.load(f)
         
         # only retrieve the documents that contain the keywords
         only_key_docs = []
-        query_keywords = keyword_extraction.extract_keywords(kw_model, query, ngram_range=2, top_n=3)
+        query_keywords = keyword_extraction.extract_keywords(kw_model, new_query.query, ngram_range=2, top_n=3)
         for doc in all_docs:
             for keyword in query_keywords:
                 doc_keywords = ' '.join(doc.keywords)
@@ -173,16 +196,22 @@ if __name__ == '__main__':
     # map keywords to documents
     doc_dict = {}
     for doc in all_docs:
-        doc_dict[' '.join(doc.keywords)] = doc.text
-    
+         doc_dict[' '.join(doc.keywords)] = doc.text
+
     print(f'Transformed query: {query_keywords}') 
     matches = get_matching_documents(' '.join(query_keywords), only_key_docs)
-    # output top 5 matches
+    # retrieves top 5 matches
     context = ""
     for i, match in enumerate(matches[:5]):
         context += (doc_dict[match] + ' ')
     
+    # check if there are no matches
+    if context.isspace():
+        raise Exception("There is no context available.")
+    
     print("Context:\n" + context + '\n\n')
     pipeline = Pipeline()
-    pipeline.get_answer(query, context)
-    
+    pipeline.get_answer(new_query.query, context)
+
+if __name__ == '__main__':
+    ask_bert("Syllabus-3377-converted.docx", "Who is the professor?")
