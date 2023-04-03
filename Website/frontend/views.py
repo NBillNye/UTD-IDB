@@ -13,4 +13,6 @@ def ThreadList(response):
         print("threads_data >>>> ", threads_data)
         return render(response, "ThreadList/index.html", {"threads": threads_data})
     return render(response, "ThreadList/index.html", {})
-        
+
+def Thread(response):
+    return render(response, 'Thread/index.html', {"title": "This is a test title"})
