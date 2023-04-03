@@ -147,7 +147,7 @@ def process_course_material(docx_path, kw_model):
         #print(keywords)
         docs.append(Doc(document, keywords))
     
-    with open('course_material_docs.pickle', 'wb') as f:
+    with open(pickled_name(docx_path), 'wb') as f:
         pickle.dump(docs, f)
     
     #print('Done processing course_material.')
@@ -163,9 +163,15 @@ def get_similar_words(keyword):
 
 # Checks if docx has already been processed
 def process_docx(docx_path, kw_model):
-    if not os.path.exists('course_material_docs.pickle'):               #TODO: Make pickle file names dynamic to given docx name
+    if not os.path.exists(pickled_name(docx_path)):              
         process_course_material(docx_path, kw_model)
 
+# Changes the file name to .pickle
+def pickled_name(docx_path) -> str:
+    pickled_path = docx_path.replace('docx' , 'pickle')
+    return pickled_path
+
+# 
 def ask_bert(docx_path, query):
     new_query = inputs()
     new_query.set_docx_path(docx_path)
@@ -176,11 +182,11 @@ def ask_bert(docx_path, query):
 # Takes in question and docx and outputs answer with confidence score
 def ask_bert_detailed(new_query):
 
-    kw_model = keyword_extraction.load()                                #TODO: fix kw_model needs
+    kw_model = keyword_extraction.load()                              
 
     process_docx(new_query.docx_path, kw_model)
 
-    with open('course_material_docs.pickle', 'rb') as f:
+    with open(pickled_name(new_query.docx_path), 'rb') as f:
         all_docs = pickle.load(f)
         
         # only retrieve the documents that contain the keywords
@@ -205,13 +211,12 @@ def ask_bert_detailed(new_query):
     for i, match in enumerate(matches[:5]):
         context += (doc_dict[match] + ' ')
     
-    # check if there are no matches
-    if context.isspace():
-        raise Exception("There is no context available.")
-    
     print("Context:\n" + context + '\n\n')
     pipeline = Pipeline()
-    pipeline.get_answer(new_query.query, context)
+    try:
+        pipeline.get_answer(new_query.query, context)
+    except ValueError:
+        print('Error: No context or query given')
 
 if __name__ == '__main__':
-    ask_bert("Syllabus-3377-converted.docx", "Who is the professor?")
+    ask_bert("Syllabus-3377-converted.docx", "What language do we use for the progamming projects?")

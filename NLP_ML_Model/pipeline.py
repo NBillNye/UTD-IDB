@@ -3,9 +3,14 @@ from transformers import pipeline
 class Pipeline:
     def __init__(self):
         self.question_answerer = pipeline("question-answering", model='distilbert-base-uncased-distilled-squad')
+        #self.question_answerer = pipeline("question-answering", model='bert-large-uncased-whole-word-masking-finetuned-squad')
+
     def get_answer(self, question: str, context: str) -> str:
         result = self.question_answerer(question=question, context=context)
         print(f"\nAnswer: '{result['answer']}', score: {round(result['score'], 4)}, start: {result['start']}, end: {result['end']}")
+        #if(result['score'] < 0.5):
+        #    print("Warning: Low Confidence Score ")
+        
         return result
     
 if __name__ == '__main__':
@@ -19,5 +24,5 @@ if __name__ == '__main__':
     Table below is indicative letter grade for total points scored. There may be some curving, but not guaranteed.
     """
     
-    question = "What is all of the grading criteria?"
+    question = "What language do we use for the progamming projects?"
     pipeline.get_answer(question, context)
