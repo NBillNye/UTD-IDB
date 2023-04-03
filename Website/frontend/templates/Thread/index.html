@@ -7,15 +7,7 @@
         <div class="ui orange inverted menu">
             <div class="ui container">
                 <div class="item">
-                    <div class="ui icon input">
-                        <input class="prompt" type="text" placeholder="Search...">
-                        <i class="search icon"></i>
-                    </div>
-                </div>
-                <div class="right menu">
-                    <div class="item">
-                        <button class="ui orange button">Add Thread</button>
-                    </div>
+                    <button class="ui white button">< Back</button>
                 </div>
             </div>
         </div>
@@ -23,24 +15,27 @@
     <br>
     <div class="ui thread container">
         <div class="ui divided items">
-            {% for thread in threads %}
-            <div class="item thread-item">
+            <div class="item thread-item" id="thread-{{thread.ID}}">
                 <div class="content">
-                    <a class="header">{{ thread.Name }}</a>
-                    <span class="date"> ({{ thread.Date }})</span>
+                    <a class="header">{{title}}</a>
+                    <span class="date"> ({{ date }})</span>
                     <div class="meta">
-                        <span>Written by {{ thread.Author }}</span>
+                        <span>Written by {{ author }}</span>
                     </div>
                     <div class="description">
-                        <p>{{ thread.Description|truncatewords:30 }}</p>
+                        <p>{{ thread.Description }}</p>
                     </div>
                 </div>
             </div>
-            {% endfor %}
         </div>
     </div>
 </body>
 </html>
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+    });
+</script>
 <style>
     .thread {
         cursor: pointer;
