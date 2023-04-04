@@ -39,8 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'shibboleth',
     'frontend'
 ]
+
+AUTHENTICATION_BACKENDS =(
+  'shibboleth.backends.ShibbolethRemoteUserBackend',
+)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -48,9 +53,24 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+SHIBBOLETH_USER_KEY='<shibboleth-attribute>'
+
+SHIBBOLETH_ATTRIBUTE_MAP = {
+    "shib-user": (True, "username"),
+    "shib-given-name": (True, "first_name"),
+    "shib-sn": (True, "last_name"),
+    "shib-mail": (False, "email"),
+}
+
+SHIBBOLETH_LOGIN_URL = 'https://your_domain.edu/Shibboleth.sso/Login'
+SHIBBOLETH_LOGOUT_URL = 'https://your_domain.edu/Shibboleth.sso/Logout'
+LOGIN_URL = '/shib/login/'
+SHIBBOLETH_DJANGO_SESSION_MAY_OUTLIVE_SHIBBOLETH_SESSION = True
 
 ROOT_URLCONF = 'Website.urls'
 

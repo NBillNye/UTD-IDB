@@ -17,9 +17,12 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls import url
 
 urlpatterns = [
     path('api/', include('backend.urls')),
     path('', include('frontend.urls')),
     path('admin/', admin.site.urls),
+    url(r'^shib/', include('shibboleth.urls', namespace='shibboleth'))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
