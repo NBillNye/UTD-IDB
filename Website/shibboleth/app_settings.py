@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 
-SHIB_ATTRIBUTE_LIST = getattr(settings, 'SHIBBOLETH_ATTRIBUTE_LIST')
+SHIB_ATTRIBUTE_LIST = getattr(settings, 'SHIBBOLETH_ATTRIBUTE_MAP')
 #Set to true if you are testing and want to insert sample headers.
 SHIB_MOCK_HEADERS = getattr(settings, 'SHIBBOLETH_MOCK_HEADERS', False)
 

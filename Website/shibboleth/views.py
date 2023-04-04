@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
-from urllib import quote
+from urllib.parse import quote
 
 #Logout settings.
 from shibboleth.app_settings import SHIBBOLETH_LOGIN_URL, SHIBBOLETH_LOGOUT_URL, LOGOUT_REDIRECT_URL
