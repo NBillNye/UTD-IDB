@@ -18,3 +18,9 @@ def Thread(response, thread_id=-1):
             return render(response, 'Thread/index.html', {"thread": thread})
 
     return render(response, 'Thread/index.html', {"title": "This is a test title"})
+
+def Classes(response):
+    classesL = db.Class.objects.all()
+    if classesL is not None:
+        return render(response, 'Classes/index.html', {"Classes": classesL})
+    return render(response, "Classes/index.html", {})
