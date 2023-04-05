@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'frontend'
+    'rest_framework',
+    'frontend.apps.FrontendConfig',
 ]
 
 MIDDLEWARE = [
@@ -54,8 +55,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'Website.urls'
-
-
 
 TEMPLATES = [
     {
@@ -80,6 +79,14 @@ WSGI_APPLICATION = 'Website.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mydb',
+        'USER': 'db_user',
+        'PASSWORD': config("DB_CREDS"),
+        'HOST': '10.176.67.73',
+        'PORT':'3306',
+    },
+    'local': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'mydb',
         'USER': 'root',

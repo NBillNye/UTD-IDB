@@ -1,18 +1,20 @@
 from django.shortcuts import render
 import requests
 from decouple import config
+from . import models as db
 
 # Create your views here.
 
 def ThreadList(response):
-    print("REQUEST >>>> ", config("API_URL") + "threads/GetThreadList/1/")
-    threads = requests.post(config("API_URL") + "threads/GetThreadList/1/")
-    print("RESPONSE >>>> ", threads)
+    threads = db.Thread.objects.all()
     if threads is not None:
-        threads_data = threads.json()
-        print("threads_data >>>> ", threads_data)
-        return render(response, "ThreadList/index.html", {"threads": threads_data})
+        return render(response, 'ThreadList/index.html', {"threads": threads})
     return render(response, "ThreadList/index.html", {})
 
-def Thread(response):
+def Thread(response, thread_id=-1):
+    if thread_id != -1:
+        thread = db.Thread.objects.filter(threadid = thread_id).first()
+        if thread is not None:
+            return render(response, 'Thread/index.html', {"thread": thread})
+
     return render(response, 'Thread/index.html', {"title": "This is a test title"})

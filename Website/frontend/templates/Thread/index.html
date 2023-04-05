@@ -7,7 +7,7 @@
         <div class="ui orange inverted menu">
             <div class="ui container">
                 <div class="item">
-                    <button class="ui white button">< Back</button>
+                    <button class="ui white button" id="backButton">< Back</button>
                 </div>
             </div>
         </div>
@@ -15,15 +15,15 @@
     <br>
     <div class="ui thread container">
         <div class="ui divided items">
-            <div class="item thread-item" id="thread-{{thread.ID}}">
+            <div class="item thread-item">
                 <div class="content">
-                    <a class="header">{{title}}</a>
-                    <span class="date"> ({{ date }})</span>
+                    <a class="header">{{ thread.threadtitle }}</a>
+                    <span class="date"> ({{ thread.creationdate }})</span>
                     <div class="meta">
-                        <span>Written by {{ author }}</span>
+                        <span>Written by {{ thread.student_netid }}</span>
                     </div>
                     <div class="description">
-                        <p>{{ thread.Description }}</p>
+                        <p>{{ thread.threadcontent }}</p>
                     </div>
                 </div>
             </div>
@@ -33,7 +33,9 @@
 </html>
 <script type="text/javascript">
     $(document).ready(function () {
-        
+        $("#backButton").click(function() {
+            window.location.replace("/ThreadList");
+        })
     });
 </script>
 <style>

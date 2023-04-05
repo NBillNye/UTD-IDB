@@ -24,15 +24,15 @@
     <div class="ui thread container">
         <div class="ui divided items">
             {% for thread in threads %}
-            <div class="item thread-item">
+            <div class="item thread-item" id="{{thread.pk}}">
                 <div class="content">
-                    <a class="header">{{ thread.Name }}</a>
-                    <span class="date"> ({{ thread.Date }})</span>
+                    <a class="header">{{ thread.threadtitle }}</a>
+                    <span class="date"> ({{ thread.creationdate }})</span>
                     <div class="meta">
-                        <span>Written by {{ thread.Author }}</span>
+                        <span>Written by {{ thread.student_netid }}</span>
                     </div>
                     <div class="description">
-                        <p>{{ thread.Description|truncatewords:30 }}</p>
+                        <p>{{ thread.threadcontent|truncatewords:30 }}</p>
                     </div>
                 </div>
             </div>
@@ -41,6 +41,13 @@
     </div>
 </body>
 </html>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".thread-item").click(function (e) {
+            window.location.replace("/Thread/" + $(this).attr('id') + '/');
+        });
+    });
+</script>
 <style>
     .thread {
         cursor: pointer;
