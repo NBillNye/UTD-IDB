@@ -6,11 +6,13 @@
     <div>
         <div class="ui orange inverted menu">
             <div class="ui container">
-                <div class="item">
+                <div class="ui search">
                     <div class="ui icon input">
                         <input class="prompt" type="text" placeholder="Search...">
                         <i class="search icon"></i>
                     </div>
+                </div>
+                <div class="result">
                 </div>
             </div>
         </div>
@@ -20,7 +22,7 @@
     {% for Class in Classes %}
     <div class="ui class container">
         <div class="ui divided items">
-            <div class="item thread-item">
+            <div class="item class-item">
                 <div class="content">
                     <a class="header">{{ Class.classnumber }}.{{Class.sectionnumber}}:{{Class.classname}}</a>
                     <div class="meta">
@@ -36,6 +38,15 @@
     {% endfor %}
 </body>
 </html>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".class-item").click(function (e) {
+            window.location.replace("/ThreadList");
+        });
+    });
+    
+; 
+</script> 
 <style>
     .ui.class.container{
         width: 1130px; 
