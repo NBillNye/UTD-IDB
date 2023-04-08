@@ -5,10 +5,15 @@ from . import models as db
 
 # Create your views here.
 
-def ThreadList(response):
-    threads = db.Thread.objects.all()
-    if threads is not None:
-        return render(response, 'ThreadList/index.html', {"threads": threads})
+def ThreadList(response, classId = -1):
+    if classId == -1:
+        threads = db.Thread.objects.all()
+        if threads is not None:
+            return render(response, 'ThreadList/index.html', {"threads": threads})
+    else:
+        threads = db.Thread.objects.filter(class_classid = classId)
+        if threads is not None:
+            return render(response, 'ThreadList/index.html', {"threads": threads})
     return render(response, "ThreadList/index.html", {})
 
 def Thread(response, thread_id=-1):

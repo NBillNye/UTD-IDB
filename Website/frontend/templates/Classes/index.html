@@ -22,7 +22,7 @@
     {% for Class in Classes %}
     <div class="ui class container">
         <div class="ui divided items">
-            <div class="item class-item">
+            <div class="item class-item" id="{{Class.classid}}">
                 <div class="content">
                     <a class="header">{{ Class.classnumber }}.{{Class.sectionnumber}}:{{Class.classname}}</a>
                     <div class="meta">
@@ -41,7 +41,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $(".class-item").click(function (e) {
-            window.location.replace("/ThreadList");
+            window.location.replace($(this).attr('id') + "/ThreadList");
         });
     });
     
