@@ -29,6 +29,10 @@
             </div>
         </div>
     </div>
+    <div class="ui fluid action input" id="reply">
+        <input name="description"></input>
+        <div class="ui button" id="replyButton">Reply</div>
+      </div>
     <div class="ui reply container">
         <div class="ui divided items">
             {% for reply in thread.replies %}
@@ -51,6 +55,46 @@
     $(document).ready(function () {
         $("#backButton").click(function() {
             window.location.href = "/ThreadList";
+        })
+        $("#replyButton").click(function () {
+            var desc = $("#reply").find('input[name="description"]').val();
+            console.log('desc', desc)
+            var thid = $('#thread').find('id[name="threradid"]').val();
+            console.log('threadid',thid)
+            var data = {"description": desc};
+
+            $.ajax({
+                url: window.location.href,
+                method: "POST",
+                data: JSON.stringify(data),
+                success: function(response) {
+                    console.log("Success:", response);
+                    window.location.href ='/Thread/'+ response + '/';
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", errorThrown);
+                }
+            });
+        })
+        $("#replyButton").click(function () {
+            var desc = $("#reply").find('input[name="description"]').val();
+            console.log('desc', desc)
+            var thid = $('#thread').find('id[name="threradid"]').val();
+            console.log('threadid',thid)
+            var data = {"description": desc};
+
+            $.ajax({
+                url: window.location.href,
+                method: "POST",
+                data: JSON.stringify(data),
+                success: function(response) {
+                    console.log("Success:", response);
+                    window.location.href ='/Thread/'+ response + '/';
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", errorThrown);
+                }
+            });
         })
     });
 </script>

@@ -1,0 +1,58 @@
+{% extends 'Shared/SharedView.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<body>
+    <div>
+        <div class="ui orange inverted menu">
+            <div class="ui container">
+                <div class="ui search">
+                    <div class="ui icon input">
+                        <input class="prompt" type="text" placeholder="Search...">
+                        <i class="search icon"></i>
+                    </div>
+                </div>
+                <div class="result">
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    {% for Class in Classes %}
+    <div class="ui class container">
+        <div class="ui divided items">
+            <div class="item class-item" id="{{Class.classid}}">
+                <div class="content">
+                    <a class="header">{{ Class.classnumber }}.{{Class.sectionnumber}}:{{Class.classname}}</a>
+                    <div class="meta">
+                        <span>Professor {{ Class.professor_professornetid}}</span>
+                    </div>
+                    <div class="description">
+                        <p>{{ Class.classid}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</body>
+</html>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".class-item").click(function (e) {
+            window.location.replace($(this).attr('id') + "/ThreadList");
+        });
+    });
+    
+; 
+</script> 
+<style>
+    .ui.class.container{
+        width: 1130px; 
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1); 
+        padding: 10px; display: flex; 
+        justify-content: space-between;
+    }
+</style>
+{% endblock %}
