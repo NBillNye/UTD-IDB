@@ -16,7 +16,7 @@ from datetime import datetime
 
 def ThreadList(request, classId = -1):
     if classId == -1:
-        threads = db.Thread.objects.all()
+        threads = db.Thread.objects.all().order_by("-creationdate")
         if threads is not None:
             return render(request, 'ThreadList/index.html', {"threads": threads})
     else:
