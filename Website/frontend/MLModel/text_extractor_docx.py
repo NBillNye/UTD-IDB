@@ -8,8 +8,8 @@ from docx import Document
 import pickle
 import os
 
-import keyword_extraction
-from pipeline import *
+from . import keyword_extraction
+from .pipeline import *
 
 class Doc:
     def __init__(self, text, keywords):
@@ -177,7 +177,7 @@ def ask_bert(docx_path, query):
     new_query.set_docx_path(docx_path)
     new_query.set_query(query)
 
-    ask_bert_detailed(new_query)
+    return ask_bert_detailed(new_query)
 
 # Takes in question and docx and outputs answer with confidence score
 def ask_bert_detailed(new_query):
@@ -214,9 +214,9 @@ def ask_bert_detailed(new_query):
     print("Context:\n" + context + '\n\n')
     pipeline = Pipeline()
     try:
-        pipeline.get_answer(new_query.query, context)
+        return pipeline.get_answer(new_query.query, context)
     except ValueError:
         print('Error: No context or query given')
 
 if __name__ == '__main__':
-    ask_bert("Syllabus-3377-converted.docx", "What language do we use for the progamming projects?")
+    ask_bert("Syllabus-3377-converted.docx", "What language do we use for the programming projects?")
