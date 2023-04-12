@@ -14,7 +14,7 @@
                 </div>
                 <div class="right menu">
                     <div class="item">
-                        <button class="ui orange button">Add Thread</button>
+                        <button class="ui orange button" id="addThread">Add Thread</button>
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                     <a class="header">{{ thread.threadtitle }}</a>
                     <span class="date"> ({{ thread.creationdate }})</span>
                     <div class="meta">
-                        <span>Written by {{ thread.student_netid }}</span>
+                        <span>Written by {{ thread.student_netid.firstname }} {{ thread.student_netid.lastname }}</span>
                     </div>
                     <div class="description">
                         <p>{{ thread.threadcontent|truncatewords:30 }}</p>
@@ -44,7 +44,11 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $(".thread-item").click(function (e) {
-            window.location.replace("/Thread/" + $(this).attr('id') + '/');
+            window.location.href = "/Thread/" + $(this).attr('id') + '/';
+        });
+        
+        $("#addThread").click(function (e) {
+            window.location.href = "/CreateThread";
         });
     });
 </script>

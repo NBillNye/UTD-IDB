@@ -14,13 +14,13 @@
     </div>
     <br>
     <div class="ui thread container">
-        <div class="ui divided items" id="thread">
-            <div class="item thread-item">
-                <div class="content" id="{{thread.threadid}}" name= "threradid">
-                    <a class="header">{{ thread.threadtitle }}</a>
+        <div class="ui divided items">
+            <div class="item thread-item" id="thread-{{thread.ID}}">
+                <div class="content">
+                    <div class="header">{{ thread.threadtitle}}</div>
                     <span class="date"> ({{ thread.creationdate }})</span>
                     <div class="meta">
-                        <span>Written by {{ thread.student_netid }}</span>
+                        <span>Written by {{ thread.student_netid.firstname }} {{ thread.student_netid.lastname }}</span>
                     </div>
                     <div class="description">
                         <p>{{ thread.threadcontent }}</p>
@@ -33,10 +33,10 @@
         <input name="description"></input>
         <div class="ui button" id="replyButton">Reply</div>
       </div>
-    <br>
     <div class="ui reply container">
         <div class="ui divided items">
             {% for reply in thread.replies %}
+            <br>
             <div class="item reply-item">
                 <div class="content">
                     <div class="header">{{reply.student_netid.firstname}} {{ reply.student_netid.lastname }}</div>
@@ -54,7 +54,27 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $("#backButton").click(function() {
-            window.location.replace("/ThreadList");
+            window.location.href = "/ThreadList";
+        })
+        $("#replyButton").click(function () {
+            var desc = $("#reply").find('input[name="description"]').val();
+            console.log('desc', desc)
+            var thid = $('#thread').find('id[name="threradid"]').val();
+            console.log('threadid',thid)
+            var data = {"description": desc};
+
+            $.ajax({
+                url: window.location.href,
+                method: "POST",
+                data: JSON.stringify(data),
+                success: function(response) {
+                    console.log("Success:", response);
+                    window.location.href ='/Thread/'+ response + '/';
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", errorThrown);
+                }
+            });
         })
         $("#replyButton").click(function () {
             var desc = $("#reply").find('input[name="description"]').val();
@@ -87,7 +107,7 @@
         justify-content: space-between;
     }
     
-    .ui.reply.item{
+    .ui.reply.container{
         width: 1130px; 
         height: 150px;
         box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1); 

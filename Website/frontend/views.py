@@ -1,25 +1,29 @@
 import json
 from django.http import JsonResponse
+import json
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 import requests
 from decouple import config
 from . import models as db
 from datetime import datetime
+from datetime import datetime
 
 # Create your views here.
 
-def ThreadList(response, classId = -1):
+def ThreadList(request, classId = -1):
     if classId == -1:
         threads = db.Thread.objects.all()
         if threads is not None:
-            return render(response, 'ThreadList/index.html', {"threads": threads})
+            return render(request, 'ThreadList/index.html', {"threads": threads})
     else:
         threads = db.Thread.objects.filter(class_classid = classId)
         if threads is not None:
-            return render(response, 'ThreadList/index.html', {"threads": threads})
-    return render(response, "ThreadList/index.html", {})
+            return render(request, 'ThreadList/index.html', {"threads": threads})
+    return render(request, "ThreadList/index.html", {})
 @csrf_exempt
 def Thread(request, thread_id=-1):
     if request.method == "POST":
@@ -45,13 +49,32 @@ def Thread(request, thread_id=-1):
 
     return render(request, 'Thread/index.html', {})
 
-def Classes(response, classNum = ''):
+def Classes(request, classNum = ''):
     if classNum == '':
        classesL = db.Class.objects.all()
        if classesL is not None:
-        return render(response, 'Classes/index.html', {"Classes": classesL}) 
+        return render(request, 'Classes/index.html', {"Classes": classesL}) 
     else:
         classesL = db.Class.objects.filter(classnumber = classNum)
         if classesL is not None:
-            return render(response, 'Classes/index.html', {"Classes": classesL}) 
-    return render(response, "Classes/index.html", {})
+            return render(request, 'Classes/index.html', {"Classes": classesL}) 
+    return render(request, "Classes/index.html", {})
+
+@csrf_exempt
+def CreateThread(request):
+    if request.method == "POST":
+        # Create Thread
+
+        data = json.loads(request.body)
+        print(data["title"])
+        
+        classObj = db.Class.objects.filter(classid=24313).first()
+        studentObj = db.Student.objects.filter(netid="abc123000").first()
+
+        newThread = db.Thread.objects.create(threadtitle=data["title"], 
+                                             threadcontent=data["description"],
+                                             class_classid=classObj,
+                                             creationdate=datetime.now(),
+                                             student_netid=studentObj)
+        return JsonResponse(newThread.threadid, safe=False)
+    return render(request, "CreateThread/index.html", {})

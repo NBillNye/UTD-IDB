@@ -1,0 +1,54 @@
+{% extends 'Shared/SharedView.html' %}
+{% block content %}
+<html>
+    <div class="ui orange inverted segment">
+        <div class="ui container">
+            <h2 class="ui white header">Create New Thread</h2>
+        </div>
+    </div>
+
+    <div class="ui padded container">
+        <form class="ui form" id="threadForm">
+            <div class="field">
+                <label>Title</label>
+                <input type="text" name="title">
+            </div>
+            <div class="field">
+                <label>Description</label>
+                <textarea name="description"></textarea>
+            </div>
+            <div class="ui orange button" id="submitButton">Submit</div>
+        </form>
+    </div>
+</html>
+<style>
+    .ui.white.header {
+        color: white;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#submitButton").click(function () {
+            var title = $("#threadForm").find('input[name="title"]').val();
+            var desc = $("#threadForm").find('textarea[name="description"]').val();
+            console.log('title', title)
+            console.log('desc', desc)
+
+            var data = {"title": title, "description": desc};
+
+            $.ajax({
+                url: "/CreateThread",
+                method: "POST",
+                data: JSON.stringify(data),
+                success: function(response) {
+                    console.log("Success:", response);
+                    window.location.href ='/Thread/'+ response + '/';
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", errorThrown);
+                }
+            });
+        })
+    });
+</script>
+{% endblock %}
