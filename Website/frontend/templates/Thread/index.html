@@ -33,10 +33,10 @@
         <input name="description"></input>
         <div class="ui button" id="replyButton">Reply</div>
       </div>
+    {% if thread.replies %}
     <div class="ui reply container">
         <div class="ui divided items">
             {% for reply in thread.replies %}
-            <br>
             <div class="item reply-item">
                 <div class="content">
                     <div class="header">{{reply.student_netid.firstname}} {{ reply.student_netid.lastname }}</div>
@@ -49,6 +49,7 @@
             {% endfor %}
         </div>
     </div>
+    {% endif %}
 </body>
 </html>
 <script type="text/javascript">
@@ -102,7 +103,7 @@
     .ui.thread.container{
         width: 1130px; 
         height: 150px;
-        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1); 
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5); 
         padding: 10px; display: flex; 
         justify-content: space-between;
     }
@@ -110,13 +111,13 @@
     .ui.reply.container{
         width: 1130px; 
         height: 150px;
-        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1); 
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5); 
         padding: 10px; display: flex; 
         justify-content: space-between;
     }
 
     .thread-item {
-        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1);
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
         padding: 10px;
         display: flex;
         justify-content: space-between;

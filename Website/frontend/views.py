@@ -1,16 +1,13 @@
 import json
 from django.http import JsonResponse
-import json
-from django.http import JsonResponse
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from decouple import config
 from . import models as db
 from datetime import datetime
-from datetime import datetime
+from .MLModel.text_extractor_docx import ask_bert
+import os
 
 # Create your views here.
 
@@ -76,5 +73,24 @@ def CreateThread(request):
                                              class_classid=classObj,
                                              creationdate=datetime.now(),
                                              student_netid=studentObj)
+        
+        __AskBert(data["description"], newThread)
+        
         return JsonResponse(newThread.threadid, safe=False)
     return render(request, "CreateThread/index.html", {})
+
+
+def __AskBert(query, thread):
+    result = ask_bert('Syllabus-3377-converted.docx', query)
+
+    botStudentObj = db.Student.objects.filter(netid = "bot000001").first()
+    
+    print('\nRESULT: ', result, '\n')
+
+    if result['score'] >= 0.5:
+        db.Reply.objects.create(
+            thread_threadid = thread,
+            creationdate=datetime.now(),
+            content=result["answer"],
+            student_netid = botStudentObj
+        )
