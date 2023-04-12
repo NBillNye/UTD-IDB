@@ -14,9 +14,9 @@
     </div>
     <br>
     <div class="ui thread container">
-        <div class="ui divided items">
+        <div class="ui divided items" id="thread">
             <div class="item thread-item">
-                <div class="content">
+                <div class="content" id="{{thread.threadid}}" name= "threradid">
                     <a class="header">{{ thread.threadtitle }}</a>
                     <span class="date"> ({{ thread.creationdate }})</span>
                     <div class="meta">
@@ -28,10 +28,26 @@
                 </div>
             </div>
         </div>
-        <div class="ui fluid action input">
-            <input type="text" placeholder="Type your reply here...">
-            <div class="ui button">Reply</div>
-          </div>
+    </div>
+    <div class="ui fluid action input" id="reply">
+        <input name="description"></input>
+        <div class="ui button" id="replyButton">Reply</div>
+      </div>
+    <br>
+    <div class="ui reply container">
+        <div class="ui divided items">
+            {% for reply in thread.replies %}
+            <div class="item reply-item">
+                <div class="content">
+                    <div class="header">{{reply.student_netid.firstname}} {{ reply.student_netid.lastname }}</div>
+                    <span class="date"> ({{reply.creationdate}})</span>
+                    <div class="description">
+                        <p>{{reply.content}}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </body>
 </html>
@@ -40,11 +56,43 @@
         $("#backButton").click(function() {
             window.location.replace("/ThreadList");
         })
+        $("#replyButton").click(function () {
+            var desc = $("#reply").find('input[name="description"]').val();
+            console.log('desc', desc)
+            var thid = $('#thread').find('id[name="threradid"]').val();
+            console.log('threadid',thid)
+            var data = {"description": desc};
+
+            $.ajax({
+                url: window.location.href,
+                method: "POST",
+                data: JSON.stringify(data),
+                success: function(response) {
+                    console.log("Success:", response);
+                    window.location.href ='/Thread/'+ response + '/';
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", errorThrown);
+                }
+            });
+        })
     });
 </script>
 <style>
-    .thread {
-        cursor: pointer;
+    .ui.thread.container{
+        width: 1130px; 
+        height: 150px;
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1); 
+        padding: 10px; display: flex; 
+        justify-content: space-between;
+    }
+    
+    .ui.reply.item{
+        width: 1130px; 
+        height: 150px;
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1); 
+        padding: 10px; display: flex; 
+        justify-content: space-between;
     }
 
     .thread-item {

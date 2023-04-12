@@ -61,6 +61,7 @@ class Reply(models.Model):
     creationdate = models.DateTimeField(db_column='CreationDate')  # Field name made lowercase.
     content = models.TextField(db_column='Content')  # Field name made lowercase.
     student_netid = models.ForeignKey('Student', models.DO_NOTHING, db_column='Student_NetID')  # Field name made lowercase.
+    replyid = models.AutoField(db_column='ReplyID', primary_key=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
