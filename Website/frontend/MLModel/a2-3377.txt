@@ -1,0 +1,24 @@
+CS 3377 System Prog. in Unix and other Envs.
+Assignment 2
+Due: Wednesday, Feb 2:  11:59 PM (on elearning).
+
+For this assignment, you will write two (complex) commands. In a given text file, you need find the 10 most frequently used words and 10 least frequently used words. Once you write a command to find 10 most frequently used words, you can easily tweak the command to find the 10 least frequently used words. 
+You may have to use xargs, grep, sort, and several other commands to solve these problems. Note that each problem can be solved using combination of multiple commands; but all these commands should be in a single line (of any length).
+For example,
+	sort ypages > out
+	uniq out
+is not a single line command. Whereas the following is a single line command.
+	sort ypages | uniq
+
+You should write two single line commands for the two problems.
+
+While counting the frequency you should ignore these words: 'the', 'an', 'a', 'of', and 'and'. Do not use grep multiple times for this.
+Also, while comparing/matching the words ignore the difference in cases. 
+
+Use the file 'story.txt' in shared box folder as input. You can either download this to cs1/cs2, or use copy and paste.
+	
+Login to cs1/cs2/cs3. Execute the following operations and submit the screenshot of the output on elearning.
+1. Execute whoami
+2. Execute the command to find 10 most frequently used words
+3. Execute the command to find 10 least frequently used words
+	
