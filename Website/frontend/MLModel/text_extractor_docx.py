@@ -8,8 +8,8 @@ from docx import Document
 import pickle
 import os
 
-import keyword_extraction
-from pipeline import *
+from . import keyword_extraction
+from .pipeline import *
 
 class Doc:
     def __init__(self, text, keywords):
@@ -18,15 +18,15 @@ class Doc:
 
 # getter and setter for inputs
 class inputs:
-    def __init__(self, file_path, query: str):
-        self.file_path = file_path
+    def __init__(self, docx_path, query):
+        self.docx_path = docx_path
         self.query = query
 
     def __init__(self):
         return
 
-    def set_file_path(self, file_path):
-        self.file_path = file_path
+    def set_docx_path(self, docx_path):
+        self.docx_path = docx_path
 
     def set_query(self, query):
         self.query = query
@@ -128,29 +128,18 @@ def extract_text_from_bold(docx_path: str) -> list:
     
     return bolded_documents  
 
-def process_course_material(file_path, kw_model):
-    print('Processing course material...')
-    with open(file_path, 'r') as f:
-        text = f.read()
-        keywords = keyword_extraction.extract_keywords(kw_model, text, ngram_range=3, top_n=10)
-        #print(f'Course material keywords: {keywords}')
-        doc = [Doc(text, keywords)]
-        #print(doc)
-        with open(pickled_name(file_path), 'wb') as p:
-            pickle.dump(doc, p)
-
 # TENTATIVE
 # How and where we save the keywords of a document may change (i.e. in database instead)
-def process_course_syllabus(file_path, kw_model):
+def process_course_material(docx_path, kw_model):
     '''
     Pull text in tables and organize them into a list of 'documents'
     for each document, determine keywords for each document and save them
     to a class containing both the text and keywords
     finally, pickle a list of these course_material document classes for later use
     '''
-    print('Processing syllabus...')
+    print('Processing course_material...')
     
-    table_documents = extract_text_from_tables(file_path)
+    table_documents = extract_text_from_tables(docx_path)
     
     docs = []
     for document in table_documents:
@@ -158,54 +147,57 @@ def process_course_syllabus(file_path, kw_model):
         #print(keywords)
         docs.append(Doc(document, keywords))
     
-    with open(pickled_name(file_path), 'wb') as f:
+    with open(pickled_name(docx_path), 'wb') as f:
         pickle.dump(docs, f)
     
     #print('Done processing course_material.')
 
-# Checks if file has already been processed
-def process_file(file_path, kw_model):
-    if not os.path.exists(pickled_name(file_path)):
-        if 'docx' in file_path:              
-            process_course_syllabus(file_path, kw_model)
-            return
-        process_course_material(file_path, kw_model)
-        
+# not really sure if we need this tbh
+def get_similar_words(keyword):
+    similar_words = []
+    
+    for syn in wordnet.synsets(keyword):
+        for synonym in syn.lemmas():
+            similar_words.append(synonym.name())
+    print(f'Similar words: {set(similar_words)}')
+
+# Checks if docx has already been processed
+def process_docx(docx_path, kw_model):
+    if not os.path.exists(pickled_name(docx_path)):              
+        process_course_material(docx_path, kw_model)
+
 # Changes the file name to .pickle
-def pickled_name(file_path) -> str:
-    dot_index = file_path.rfind(".")
-    pickled_path = file_path[:dot_index] + ".pickle"
+def pickled_name(docx_path) -> str:
+    pickled_path = docx_path.replace('docx' , 'pickle')
     return pickled_path
 
 # 
-def ask_bert(file_path: str, query: str):
+def ask_bert(docx_path, query):
     new_query = inputs()
-    new_query.set_file_path(file_path)
+    new_query.set_docx_path(docx_path)
     new_query.set_query(query)
 
-    ask_bert_detailed(new_query)
+    return ask_bert_detailed(new_query)
 
-# Takes in question and file and outputs answer with confidence score
-def ask_bert_detailed(new_query: inputs):
+# Takes in question and docx and outputs answer with confidence score
+def ask_bert_detailed(new_query):
 
-    kw_model = keyword_extraction.load()                    
+    kw_model = keyword_extraction.load()                              
 
-    process_file(new_query.file_path, kw_model)
-    only_key_docs = []
+    process_docx(new_query.docx_path, kw_model)
 
-    with open(pickled_name(new_query.file_path), 'rb') as f:
-        
+    with open(pickled_name(new_query.docx_path), 'rb') as f:
         all_docs = pickle.load(f)
-        #print(all_docs)
+        
         # only retrieve the documents that contain the keywords
+        only_key_docs = []
         query_keywords = keyword_extraction.extract_keywords(kw_model, new_query.query, ngram_range=2, top_n=3)
         for doc in all_docs:
-            doc_keywords = ' '.join(doc.keywords)
             for keyword in query_keywords:
-                if keyword in doc_keywords and doc_keywords not in only_key_docs:
+                doc_keywords = ' '.join(doc.keywords)
+                if keyword in doc_keywords:
                     only_key_docs.append(doc_keywords)
-                    print(f'Added doc keywords: {doc_keywords}')
-
+                    #print(f'Added doc keywords: {doc_keywords}')
 
     # map keywords to documents
     doc_dict = {}
@@ -222,10 +214,9 @@ def ask_bert_detailed(new_query: inputs):
     print("Context:\n" + context + '\n\n')
     pipeline = Pipeline()
     try:
-        pipeline.get_answer(new_query.query, context)
+        return pipeline.get_answer(new_query.query, context)
     except ValueError:
         print('Error: No context or query given')
 
 if __name__ == '__main__':
-    ask_bert("a2-3377.txt", "10 frequently used")
-    ask_bert("Syllabus-3377-converted.docx", "What is the grading policy?")
+    ask_bert("Syllabus-3377-converted.docx", "What language do we use for the programming projects?")
