@@ -179,7 +179,6 @@ def new_process(class_ID: int, thread_ID = -1, file_path = ''):
         process_file(class_data_path, file_path, kw_model)
     #print('Done processing.')
     
-    return
 
 def del_document(class_ID: int, origin: int | str):
     
