@@ -4,12 +4,12 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import spacy
-from docx import Document
 import pickle
 import os
 
 import keyword_extraction
 from pipeline import *
+import time
 
 class Doc:
     def __init__(self, text: str, keywords: list, origin: str | int):
@@ -110,28 +110,33 @@ def get_matching_documents(query: str, documents: list) -> list:
     
     return document_matches
 
-def get_similar_Docs(docs: list, query_keywords: list, top_n: int):
+def get_similar_Docs(docs: list[Doc], query_keywords: list[str], top_n: int):
     
     doc_origin_dict = {}
     for doc in docs:
-        doc_origin_dict[' '.join(doc.keywords)] = doc.origin
-    
-    # get similarities for files
-    matches = get_matching_documents(' '.join(query_keywords), docs)
+        doc_origin_dict[' '.join(doc.keywords)] = doc
 
+    doc_keywords = [' '.join(doc.keywords) for doc in docs]
+
+    # get similarities for files
+    matches = get_matching_documents(' '.join(query_keywords), doc_keywords)
+    
     top_results = []
-    for match in matches[:top_n]:
-        top_results.append(doc_origin_dict[match])
-        
+    for match in matches[:min(top_n,len(matches))]:
+        result = doc_origin_dict[match]
+        top_results.append(result.origin)
+    
     return top_results
 
 #Takes in query and class ID and retrieves similar course material file paths and thread IDs
 def query_model_detailed(new_query: Inputs):
     
+    start = time.time_ns()
+
     query_keywords = new_query.get_query_keywords()
    
     # get processed documents list corresponding to class ID
-    class_processed_documents_path = 'class_data/' + str(new_query.class_ID) # TENTATIVE
+    class_processed_documents_path = 'class_data/' + str(new_query.class_ID) + '.pickle' # TENTATIVE
     try: 
         if os.stat(class_processed_documents_path).st_size > 0:
             with open(class_processed_documents_path, 'rb') as file:
@@ -139,6 +144,7 @@ def query_model_detailed(new_query: Inputs):
                 processed_documents = pickle.load(file)
     except OSError:
         print(f'No existing file for processed documents in with class ID {new_query.class_ID}')
+        return [], []
     
     # loop through and find relevant documents
     # organize into two lists: course material file paths + thread IDs
@@ -149,15 +155,26 @@ def query_model_detailed(new_query: Inputs):
         for kw in query_keywords:
             if kw in doc_keywords:
                 if document.type == 'file' and document not in file_Docs:
+                    print('Matching file-type document found')
                     file_Docs.append(document)
                 elif document not in thread_Docs:
+                    print('Matching thread-type document found')
                     thread_Docs.append(document)
     
     # get similarities for files
-    res_file_list = get_similar_Docs(file_Docs, query_keywords, top_n=3)
+    res_file_list = []
+    res_thread_list = []
+
+    if len(file_Docs) > 0:
+        res_file_list = get_similar_Docs(file_Docs, query_keywords, top_n=3)
     # get similarities for threads
-    res_thread_list = get_similar_Docs(thread_Docs, query_keywords, top_n=3)
+    if len(thread_Docs) > 0:
+        res_thread_list = get_similar_Docs(thread_Docs, query_keywords, top_n=3)
     
+    end = time.time_ns()
+    delta = round((end-start)/1000000, 2)
+    print(f'query time: {delta} ms')
+
     return res_thread_list, res_file_list
     
     
@@ -166,10 +183,13 @@ def query_model(class_ID: int, query: str):
     new_query = Inputs()
     new_query.set_class_ID(class_ID)
     new_query.set_query(query)
-    
+
     return query_model_detailed(new_query)
     
 # update_
 
 if __name__ == '__main__':
-    query_model(12345, 'What is the grading policy?')
+    threads, files = query_model(12345, 'What is the grading policy?')
+
+    print(f'threads match: {threads}')
+    print(f'files match: {files}')

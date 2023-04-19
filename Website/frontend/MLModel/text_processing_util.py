@@ -22,6 +22,8 @@ class Doc:
         
     def set_origin(self, origin: str | int):
         self.origin = origin
+
+        print(f'New Doc obj origin type: {type(origin)}')
         if type(origin) is str:
             self.type = 'file'
         else:
@@ -81,29 +83,32 @@ def existing_doc(class_data: list, current_file_origin: int | str) -> int:
 
 def process_course_material(class_data_path, file_path, kw_model):
 
-    with open(class_data_path, 'rb') as p:
-        class_data = pickle.load(p) # list of processed Doc objs
+    try:
+        with open(class_data_path, 'rb') as p:
+            class_data = pickle.load(p) # list of processed Doc objs
+    except FileNotFoundError:
+        class_data = []
         
-        with open(file_path, 'r') as f:
-            
-            text = f.read()
-            keywords = keyword_extraction.extract_keywords(kw_model, text, ngram_range=3, top_n=10)
-            
-            existing_doc_index = existing_doc(class_data, file_path)
-            
-            if existing_doc_index != -1: # just update the keywords
-                class_data[existing_doc_index].keywords = keywords
+    with open(file_path, 'r') as f:
+        
+        text = f.read()
+        keywords = keyword_extraction.extract_keywords(kw_model, text, ngram_range=3, top_n=10)
+        
+        existing_doc_index = existing_doc(class_data, file_path)
+        
+        if existing_doc_index != -1: # just update the keywords
+            class_data[existing_doc_index].keywords = keywords
 
-            else:
-                doc = Doc()
-                doc.set_text(text)
-                doc.set_keywords(keywords)
-                doc.set_origin(str(file_path))
-                
-                class_data.append(doc)
-                
-            with open(class_data_path, 'wb') as new_p:
-                pickle.dump(class_data, new_p) # overwrite
+        else:
+            doc = Doc()
+            doc.set_text(text)
+            doc.set_keywords(keywords)
+            doc.set_origin(str(file_path))
+            
+            class_data.append(doc)
+            
+        with open(class_data_path, 'wb') as new_p:
+            pickle.dump(class_data, new_p) # overwrite
 
 # TENTATIVE
 # How and where we save the keywords of a document may change (i.e. in database instead)
@@ -117,29 +122,35 @@ def process_course_syllabus(class_data_path, file_path, kw_model):
     print('Processing syllabus...')
     
     table_documents = extract_text_from_tables(file_path)
+    try:
+        with open(class_data_path, 'rb') as p:
+            class_data = pickle.load(p) # list of processed Doc objs
+    except FileNotFoundError:
+        class_data = []
+
+    existing_doc_start_index = existing_doc(class_data, file_path)
+    print(f'Existing index start: {existing_doc_start_index}')
     
-    with open(class_data_path, 'rb') as p:
-        class_data = pickle.load(p) # list of processed Doc objs
-
-        existing_doc_start_index = existing_doc(class_data, file_path)
-        
-        for i, document in enumerate(table_documents):
-            keywords = keyword_extraction.extract_keywords(kw_model, document, ngram_range=3, top_n=10)
+    for i, document in enumerate(table_documents):
+        keywords = keyword_extraction.extract_keywords(kw_model, document, ngram_range=3, top_n=10)
 
 
-            if existing_doc_start_index != -1: # just update the keywords
-                class_data[existing_doc_start_index + i].keywords = keywords
-                
-            else:
-                doc = Doc()
-                doc.set_text(document)
-                doc.set_keywords(keywords)
-                doc.set_origin(str(file_path))
-                
-                class_data.append(doc)
-        
-        with open(class_data_path, 'wb') as new_p:
-            pickle.dump(class_data, new_p) # overwrite
+        if existing_doc_start_index != -1: # just update the keywords
+            class_data[existing_doc_start_index + i].keywords = keywords
+            
+        else:
+            doc = Doc()
+            doc.set_text(document)
+            doc.set_keywords(keywords)
+            doc.set_origin(str(file_path))
+            
+            class_data.append(doc)
+    
+
+    print(f'Updated class data: {class_data}')
+    print('Length: ', len(class_data))
+    with open(class_data_path, 'wb') as new_p:
+        pickle.dump(class_data, new_p) # overwrite
     
     #print('Done processing course_material.')
     
@@ -153,10 +164,12 @@ def pickled_name(file_path) -> str:
 
 # Checks if file has already been processed
 def process_file(class_data_path, file_path, kw_model):
-    if '.docx' in file_path:              
+    if '.docx' in file_path:  
+        print('Recognized as .docx')            
         process_course_syllabus(class_data_path, file_path, kw_model)
         return
     # ends with .txt
+    print('Recognized as .txt')
     process_course_material(class_data_path, file_path, kw_model)
         
 '''
@@ -169,25 +182,35 @@ def process_thread(class_ID, thread_ID, kw_model):
 
 def new_process(class_ID: int, thread_ID = -1, file_path = ''):
     # Process a thread or file
-    class_data_path = 'class_data/' + class_ID + '.pickle' #TENTATIVE (e.g. 12345.pickle)
+    class_data_path = 'class_data/' + str(class_ID) + '.pickle' #TENTATIVE (e.g. 12345.pickle)
+    print(f'Class data path: {class_data_path}')
     #print('Processing...')
-    kw_model = keyword_extraction.load_model()
+    kw_model = keyword_extraction.load()
     
     if thread_ID != -1:
+        print('Processing a thread')
         process_thread(class_data_path, thread_ID, kw_model)
     if file_path != '':
+        print('Processing a file')
         process_file(class_data_path, file_path, kw_model)
     #print('Done processing.')
     
 
 def del_document(class_ID: int, origin: int | str):
     
-    class_data_path = 'class_data/' + class_ID + '.pickle'
+    class_data_path = 'class_data/' + str(class_ID) + '.pickle'
 
     with open(class_data_path, 'rb') as o:
-        class_data = pickle.load(p)
+        class_data = pickle.load(o)
         
-        class_data = [doc for doc in class_data if doc.origin != origin]
-        
-        with open(class_data_path, 'wb') as c:
-            pickle.dump(class_data, c) # overwrite
+    class_data = [doc for doc in class_data if doc.origin != origin]
+    
+    print(f'Updated class data: {class_data}')
+    print('Length: ', len(class_data))
+    with open(class_data_path, 'wb') as c:
+        pickle.dump(class_data, c) # overwrite
+
+if __name__ == '__main__':
+
+    new_process(12345, file_path = 'Syllabus-3377-converted.docx')
+    #del_document(12345, 'Syllabus-3377-converted.docx')
