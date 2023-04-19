@@ -56,7 +56,7 @@ class Inputs:
         
 
 stopwords = set(stopwords.words('english'))
-nlp = spacy.load('en_core_web_lg') # py -m spacy download en_core_web_lg
+nlp = spacy.load('en_core_web_md') # py -m spacy download en_core_web_md
 lemmatizer = WordNetLemmatizer()
 
 def preprocess_text(text: str) -> str:
