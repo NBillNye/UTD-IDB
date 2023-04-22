@@ -1,6 +1,8 @@
 from docx import Document
 import pickle
 import os
+import mysql.connector
+from decouple import config
 
 import keyword_extraction
 from pipeline import *
@@ -172,11 +174,30 @@ def process_file(class_data_path, file_path, kw_model):
     print('Recognized as .txt')
     process_course_material(class_data_path, file_path, kw_model)
         
-'''
+
 def process_thread(class_ID, thread_ID, kw_model):
-    # TODO: getter for threads+replies in database
     text = get_thread_and_reply_text(thread_ID)
-''' 
+
+
+def get_thread_and_reply_text(thread_ID):
+    
+    db = mysql.connector.connect(
+        host = '10.176.67.73',
+        port = '3306',
+        user = 'db_user',
+        password = config("DB_CREDS")
+    )
+    
+    dbcursor = db.cursor()
+
+    dbcursor.execute("SELECT t.ThreadTitle, t.ThreadContent, r.Content FROM Thread as t, Reply as r WHERE t.ThreadID = (%s) AND t.ThreadID = r.Thread_ThreadID", (thread_ID))
+
+    result = dbcursor.fetchall()
+    text = ''
+    for x in result:
+        text.append(x)
+    return text
+
     
     
 
