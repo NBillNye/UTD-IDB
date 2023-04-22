@@ -17,6 +17,11 @@
                         <button class="ui orange button" id="addThread">Add Thread</button>
                     </div>
                 </div>
+                <div class="menu">
+                    <div class="item">
+                        <button class="ui orange button" id="uploadFile">Upload File</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -36,6 +41,9 @@
                     </div>
                 </div>
             </div>
+            <button class="ui delete icon button" id="{{thread.threadid}}">
+                <i class="trash alternate outline icon"></i>
+            </button>
             {% endfor %}
         </div>
     </div>
@@ -46,9 +54,28 @@
         $(".thread-item").click(function (e) {
             window.location.href = "/Thread/" + $(this).attr('id') + '/';
         });
-        
         $("#addThread").click(function (e) {
             window.location.href = "/CreateThread";
+        });
+        $("#uploadFile").click(function (e) {
+            window.location.href += "/uploadFile/";
+        });
+        $(".ui.delete.icon.button").click(function (e) {
+           var thid = $(this).attr('id')
+           console.log('threadid',thid)
+           var data = {"threadid": thid};
+           $.ajax({
+               url: window.location.href,
+               method: "DELETE",
+               data: JSON.stringify(data),
+               success: function(response) {
+                   console.log("Success:", response);
+                   window.location.href ='/ThreadList';
+               },
+               error: function(jqXHR, textStatus, errorThrown) {
+                   console.log("Error:", errorThrown);
+               }
+           });
         });
     });
 </script>

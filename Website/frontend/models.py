@@ -32,10 +32,11 @@ class Enrollment(models.Model):
 
 
 class File(models.Model):
-    filename = models.CharField(db_column='FileName', primary_key=True, max_length=45)  # Field name made lowercase.
+    filename = models.CharField(db_column='FileName', max_length=45)  # Field name made lowercase.
     filetype = models.CharField(db_column='FileType', max_length=45)  # Field name made lowercase.
     filecontent = models.TextField(db_column='FileContent')  # Field name made lowercase.
     class_classid = models.ForeignKey(Class, models.DO_NOTHING, db_column='Class_ClassID')  # Field name made lowercase.
+    fileid = models.AutoField(db_column='fileID', primary_key=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -60,6 +61,7 @@ class Reply(models.Model):
     content = models.TextField(db_column='Content')  # Field name made lowercase.
     student_netid = models.ForeignKey('Student', models.DO_NOTHING, db_column='Student_NetID')  # Field name made lowercase.
     replyid = models.AutoField(db_column='ReplyID', primary_key=True)  # Field name made lowercase.
+    parent_replyid = models.IntegerField(db_column='Parent_ReplyID')
 
     class Meta:
         managed = False

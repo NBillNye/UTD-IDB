@@ -1,0 +1,25 @@
+{% extends 'Shared/SharedView.html' %}
+{% block content %}
+<html>
+    <div class="ui orange inverted segment">
+        <div class="ui container">
+            <h2 class="ui white header">Upload Files </h2>
+        </div>
+    </div>
+
+    <div class="ui padded container">
+        <form class="ui form" id="fileForm" method="POST" enctype="multipart/form-data">
+            <div class="field">
+                <label>File</label>
+                <input type="File" name="FileDoc" multiple>
+            </div>
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+</html>
+<style>
+    .ui.white.header {
+        color: white;
+    }
+</style>
+{% endblock %}
