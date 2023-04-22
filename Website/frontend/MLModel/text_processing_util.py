@@ -195,7 +195,7 @@ def get_thread_and_reply_text(thread_ID):
     result = dbcursor.fetchall()
     text = ''
     for x in result:
-        text.append(x)
+        text += x
     return text
 
     
