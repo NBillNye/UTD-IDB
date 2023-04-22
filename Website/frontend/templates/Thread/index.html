@@ -33,11 +33,12 @@
         <input name="description"></input>
         <div class="ui button" id="replyButton">Reply</div>
     </div>
+    {% if thread.replies %}
     <div class="ui reply container">
         <div class="ui divided items">
             {% for reply in thread.replies %}
-            <div class="item reply-item" name="reply" id="{{reply.replyid}}">
-                <div class="reply content">
+            <div class="item reply-item">
+                <div class="content">
                     <div class="header">{{reply.student_netid.firstname}} {{ reply.student_netid.lastname }}</div>
                     <span class="date"> ({{reply.creationdate}})</span>
                     <div class="description">
@@ -65,6 +66,7 @@
             {% endfor %}
         </div>
     </div>
+    {% endif %}
 </body>
 </html>
 <script type="text/javascript">
@@ -134,28 +136,28 @@
     .ui.thread.container{
         width: 1130px; 
         height: 150px;
-        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1); 
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5); 
         padding: 10px; display: flex; 
         justify-content: space-between;
     }
     
-    .ui.reply.item{
+    .ui.reply.container{
         width: 1130px; 
         height: 150px;
-        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1); 
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5); 
         padding: 10px; display: flex; 
         justify-content: space-between;
     }
     .ui.chreply.item{
         width: 1100px; 
         height: 150px;
-        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1); 
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5); 
         padding: 10px; display: flex; 
         margin-left: 405px;
         justify-content: space-between;
     }
     .thread-item {
-        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1);
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
         padding: 10px;
         display: flex;
         justify-content: space-between;
