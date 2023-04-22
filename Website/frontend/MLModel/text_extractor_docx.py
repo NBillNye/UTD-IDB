@@ -8,8 +8,8 @@ from docx import Document
 import pickle
 import os
 
-import keyword_extraction
-from pipeline import *
+from . import keyword_extraction
+from . import pipeline 
 
 class Doc:
     def __init__(self, text, keywords):

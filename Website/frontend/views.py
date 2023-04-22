@@ -8,40 +8,68 @@ from . import models as db
 from datetime import datetime
 from .MLModel.text_extractor_docx import ask_bert
 import os
-
+from django.views.generic import TemplateView
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+from django.conf.urls.static import static
 # Create your views here.
 
-def ThreadList(request, classId = -1):
-    if classId == -1:
-        threads = db.Thread.objects.all().order_by("-creationdate")
-        if threads is not None:
-            return render(request, 'ThreadList/index.html', {"threads": threads})
-    else:
-        threads = db.Thread.objects.filter(class_classid = classId)
-        if threads is not None:
-            return render(request, 'ThreadList/index.html', {"threads": threads})
-    return render(request, "ThreadList/index.html", {})
 @csrf_exempt
-def Thread(request, thread_id=-1):
+def ThreadList(request, classId = -1):
+    if request.method == "DELETE":
+        data = json.loads(request.body)
+        db.Reply.objects.filter(thread_threadid = data["threadid"]).delete()
+        db.Thread.objects.filter(threadid=data["threadid"]).delete()
+        return JsonResponse(classId, safe=False)
+    else:
+        if classId == -1:
+            threads = db.Thread.objects.all().order_by("-creationdate")
+            if threads is not None:
+                return render(request, 'ThreadList/index.html', {"threads": threads})         
+        else:
+            threads = db.Thread.objects.filter(class_classid = classId)
+            if threads is not None:
+                return render(request, 'ThreadList/index.html', {"threads": threads})
+
+@csrf_exempt
+def Thread(request, thread_id=-1, Delete = '' ):
     if request.method == "POST":
         # Create Thread
 
         data = json.loads(request.body)
-        print(data["description"])
-        threadObj = db.Thread.objects.filter(threadid=thread_id).first()
-        classObj = db.Class.objects.filter(classid=24313).first()
-        studentObj = db.Student.objects.filter(netid="abc123000").first()
-        newReply = db.Reply.objects.create(thread_threadid = threadObj,
-                                           creationdate = datetime.now(),
-                                           content = data["description"],
-                                           student_netid = studentObj)
+        if data["repid"] == -1:
+            print(data["description"])
+            threadObj = db.Thread.objects.filter(threadid=thread_id).first()
+            classObj = db.Class.objects.filter(classid=24313).first()
+            studentObj = db.Student.objects.filter(netid="abc123000").first()
+            newReply = db.Reply.objects.create(thread_threadid = threadObj,
+                                            creationdate = datetime.now(),
+                                            content = data["description"],
+                                            student_netid = studentObj)
+        else:
+            print(data["description"])
+            threadObj = db.Thread.objects.filter(threadid=thread_id).first()
+            classObj = db.Class.objects.filter(classid=24313).first()
+            studentObj = db.Student.objects.filter(netid="abc123000").first()
+            newReply = db.Reply.objects.create(thread_threadid = threadObj,
+                                            creationdate = datetime.now(),
+                                            content = data["description"],
+                                            student_netid = studentObj,
+                                            parent_replyid = data["repid"])
+        return JsonResponse(thread_id, safe=False)
+    elif request.method == "DELETE":
+        data = json.loads(request.body)
+        db.Reply.objects.filter(parent_replyid = data["repid"]).delete()
+        db.Reply.objects.filter(replyid = data["repid"]).delete()
         return JsonResponse(thread_id, safe=False)
     else:
         if thread_id != -1:
             thread = db.Thread.objects.filter(threadid = thread_id).first()
             if thread is not None:
-                thread.replies = db.Reply.objects.filter(thread_threadid=thread_id).order_by("-creationdate")
-
+                thread.replies = db.Reply.objects.filter(thread_threadid=thread_id).filter(parent_replyid__isnull =True).order_by("-creationdate")
+                for i in thread.replies:
+                    repid = i.replyid
+                    i.replies = db.Reply.objects.filter(thread_threadid=thread_id).filter(parent_replyid = repid).order_by("-creationdate")
                 return render(request, 'Thread/index.html', {"thread": thread})
 
     return render(request, 'Thread/index.html', {})
@@ -67,7 +95,6 @@ def CreateThread(request):
         
         classObj = db.Class.objects.filter(classid=24313).first()
         studentObj = db.Student.objects.filter(netid="abc123000").first()
-
         newThread = db.Thread.objects.create(threadtitle=data["title"], 
                                              threadcontent=data["description"],
                                              class_classid=classObj,
@@ -94,3 +121,27 @@ def __AskBert(query, thread):
             content=result["answer"],
             student_netid = botStudentObj
         )
+@csrf_exempt
+def uploadFile(request,classId = -1):
+    if request.method == "POST":
+        # Create Thread
+        #data = json.loads(request.body)
+        
+        #uploaded_File = request.FILES.getlist["FileDoc"]
+        for f in  request.FILES.getlist("FileDoc"):
+            sizeF = f.content_type + ''
+            if len(sizeF) >= 45:
+                sizeF = sizeF[0:12] + sizeF[46:71]
+            storageurl = settings.MEDIA_URL +  '/' + str(classId) + '/'
+            storagePath = settings.MEDIA_ROOT +  '/' + str(classId) + '/'
+            fpath = settings.MEDIA_ROOT +  '/' + str(classId) + '/' + f.name
+            fileSave = FileSystemStorage(location=storagePath,base_url=storageurl)
+            fileSave.save(f.name,f)
+            classObj = db.Class.objects.filter(classid=classId).first()
+            newFile = db.File.objects.create(filename=f.name,
+                                            filetype=sizeF,
+                                            filecontent=fpath,
+                                            class_classid=classObj)
+        return render(request, "FileUpload/index.html", {})
+        
+    return render(request, "FileUpload/index.html", {})

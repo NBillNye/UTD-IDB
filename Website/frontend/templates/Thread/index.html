@@ -29,10 +29,10 @@
             </div>
         </div>
     </div>
-    <div class="ui fluid action input" id="reply">
+    <div class="ui fluid reply action input" id="reply">
         <input name="description"></input>
         <div class="ui button" id="replyButton">Reply</div>
-      </div>
+    </div>
     {% if thread.replies %}
     <div class="ui reply container">
         <div class="ui divided items">
@@ -45,7 +45,24 @@
                         <p>{{reply.content}}</p>
                     </div>
                 </div>
+                <button class="ui delete icon button" id="{{reply.replyid}}">
+                    <i class="trash alternate outline icon"></i>
+                </button>
             </div>
+            <div class="ui fluid ReReply action input">
+                <input name="description"></input>
+                <div class="ui replyRep button" id="{{reply.replyid}}">Reply to this</div>
+            </div>
+            {% for chreply in reply.replies%}
+                    <div class="item chreply-item">
+                        <div class="content">
+                        <div class="header">{{chreply.student_netid.firstname}} {{ chreply.student_netid.lastname }}</div>
+                        <span class="date"> ({{chreply.creationdate}})</span>
+                        <div class="description">
+                            <p>{{chreply.content}}</p>
+                        </div>
+                    </div>
+                {% endfor %}
             {% endfor %}
         </div>
     </div>
@@ -57,13 +74,13 @@
         $("#backButton").click(function() {
             window.location.href = "/ThreadList";
         })
+        $("#DeleteReply").click(function (e) {
+            window.location.href += "Delete";
+        });
         $("#replyButton").click(function () {
             var desc = $("#reply").find('input[name="description"]').val();
-            console.log('desc', desc)
-            var thid = $('#thread').find('id[name="threradid"]').val();
-            console.log('threadid',thid)
-            var data = {"description": desc};
-
+            var repid = -1
+            var data = {"description": desc, "repid": repid};
             $.ajax({
                 url: window.location.href,
                 method: "POST",
@@ -77,13 +94,29 @@
                 }
             });
         })
-        $("#replyButton").click(function () {
-            var desc = $("#reply").find('input[name="description"]').val();
-            console.log('desc', desc)
-            var thid = $('#thread').find('id[name="threradid"]').val();
-            console.log('threadid',thid)
-            var data = {"description": desc};
-
+        $(".ui.delete.icon.button").click(function () {
+            var repid = $(this).attr('id')
+            console.log('reply',repid)
+            var data = {"repid": repid};
+            $.ajax({
+                url: window.location.href,
+                method: "DELETE",
+                data: JSON.stringify(data),
+                success: function(response) {
+                    console.log("Success:", response);
+                    window.location.href ='/Thread/'+ response + '/';
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", errorThrown);
+                }
+            });
+        })
+        $(".ui.replyRep.button").click(function () {
+            var replyid = $(this).attr('id')
+            console.log('repid',replyid)
+            var desc = $(".ui.fluid.ReReply.action.input").find('input[name="description"]').val();
+            console.log('RRepin',desc)
+            var data = {"description": desc, "repid": replyid};
             $.ajax({
                 url: window.location.href,
                 method: "POST",
@@ -115,7 +148,14 @@
         padding: 10px; display: flex; 
         justify-content: space-between;
     }
-
+    .ui.chreply.item{
+        width: 1100px; 
+        height: 150px;
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5); 
+        padding: 10px; display: flex; 
+        margin-left: 405px;
+        justify-content: space-between;
+    }
     .thread-item {
         box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
         padding: 10px;
@@ -126,10 +166,18 @@
     .thread-item + .thread-item {
         margin-top: 10px;
     }
-
+    .ui.reply.item + .ui.reply.item {
+        margin-top: 10px;
+    }
     .thread-date {
         font-size: 14px;
         color: #999;
+    }
+    .ui.fluid.reply.action.input {
+        margin-left: 385px;
+        padding: 10px; display: flex;
+        width: 1150px; 
+        justify-content: space-between;
     }
 </style>
 
