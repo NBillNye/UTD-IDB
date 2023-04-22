@@ -176,7 +176,13 @@ def process_file(class_data_path, file_path, kw_model):
         
 
 def process_thread(class_ID, thread_ID, kw_model):
-    text = get_thread_and_reply_text(thread_ID)
+    threadtext = get_thread_and_reply_text(thread_ID)
+    
+    class_data = pickle.load(threadtext) # list of processed Doc objs
+ 
+    text = f.read()
+    keywords = keyword_extraction.extract_keywords(kw_model, text, ngram_range=3, top_n=10)
+
 
 
 def get_thread_and_reply_text(thread_ID):
@@ -201,7 +207,7 @@ def get_thread_and_reply_text(thread_ID):
     
     
 
-def new_process(class_ID: int, thread_ID = -1, file_path = ''):
+def new_process(class_ID: int, thread_ID, file_path = ''):
     # Process a thread or file
     class_data_path = 'class_data/' + str(class_ID) + '.pickle' #TENTATIVE (e.g. 12345.pickle)
     print(f'Class data path: {class_data_path}')
