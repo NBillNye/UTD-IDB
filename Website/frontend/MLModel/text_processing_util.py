@@ -211,18 +211,18 @@ def get_thread_and_reply_text(thread_ID):
         user = 'db_user',
         password = config("DB_CREDS")
     )
-    
     dbcursor = db.cursor()
 
-    dbcursor.execute("SELECT DISTINCT t.ThreadTitle, t.ThreadContent, r.Content FROM Thread as t, Reply as r WHERE t.ThreadID = (%s) AND t.ThreadID = r.Thread_ThreadID", (thread_ID))
-
+    dbcursor.execute("SELECT DISTINCT t.ThreadTitle, t.ThreadContent FROM Thread as t, Reply as r WHERE t.ThreadID = (%s) AND t.ThreadID = r.Thread_ThreadID", (thread_ID))
     result = dbcursor.fetchall() # Grab query result from cursor
-    
-    dbcursor.close()
-    
-    text = ''
+    text = result
+
+    dbcursor.execute("SELECT DISTINCT r.Content FROM Thread as t, Reply as r WHERE t.ThreadID = (%s) AND t.ThreadID = r.Thread_ThreadID", (thread_ID))
+    result = dbcursor.fetchall()
     for x in result:
         text += x
+    
+    dbcursor.close()
     return text
 
     
