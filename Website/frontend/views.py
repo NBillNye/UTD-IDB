@@ -1,6 +1,6 @@
 import json
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from decouple import config
@@ -24,12 +24,24 @@ def ThreadList(request, classId = -1):
     else:
         if classId == -1:
             threads = db.Thread.objects.all().order_by("-creationdate")
+            
+            class_id = request.session["class_id"]
+            class_name = "Class"
+            if class_id is not None:
+                threads = threads.filter(class_classid = class_id)
+                class_name = db.Class.objects.filter(classid = class_id).first().classname
             if threads is not None:
-                return render(request, 'ThreadList/index.html', {"threads": threads})         
+                return render(request, 'ThreadList/index.html', {"class_name": class_name, "threads": threads})         
         else:
+            request.session["class_id"] = classId
+
             threads = db.Thread.objects.filter(class_classid = classId)
+            class_name = db.Class.objects.filter(classid = classId).first().classname
+
             if threads is not None:
-                return render(request, 'ThreadList/index.html', {"threads": threads})
+                return render(request, 'ThreadList/index.html', {"class_name": class_name, "threads": threads})         
+
+
 
 @csrf_exempt
 def Thread(request, thread_id=-1, Delete = '' ):
@@ -71,6 +83,7 @@ def Thread(request, thread_id=-1, Delete = '' ):
                     repid = i.replyid
                     i.replies = db.Reply.objects.filter(thread_threadid=thread_id).filter(parent_replyid = repid).order_by("-creationdate")
                 return render(request, 'Thread/index.html', {"thread": thread})
+            
 
     return render(request, 'Thread/index.html', {})
 
@@ -89,12 +102,16 @@ def Classes(request, classNum = ''):
 def CreateThread(request):
     if request.method == "POST":
         # Create Thread
+        
+        net_id = request.session["net_id"]
+        class_id = request.session["class_id"]
 
         data = json.loads(request.body)
         print(data["title"])
         
-        classObj = db.Class.objects.filter(classid=24313).first()
-        studentObj = db.Student.objects.filter(netid="abc123000").first()
+        classObj = db.Class.objects.filter(classid=class_id).first()
+        studentObj = db.Student.objects.filter(netid=net_id).first()
+
         newThread = db.Thread.objects.create(threadtitle=data["title"], 
                                              threadcontent=data["description"],
                                              class_classid=classObj,
@@ -106,6 +123,18 @@ def CreateThread(request):
         return JsonResponse(newThread.threadid, safe=False)
     return render(request, "CreateThread/index.html", {})
 
+def LoginUser(request, net_id):
+    student = db.Student.objects.filter(netid = net_id).first()
+    # For testing at the moment, just grab the first class they're enrolled in
+    enrollment = db.Enrollment.objects.filter(student_netid = student).first()
+    
+    # set session information
+    request.session.clear()
+    request.session["net_id"] = net_id
+    request.session["class_id"] = enrollment.class_classid.classid
+
+    return redirect('ThreadList')
+
 
 def __AskBert(query, thread):
     result = ask_bert('Syllabus-3377-converted.docx', query)
@@ -114,7 +143,7 @@ def __AskBert(query, thread):
     
     print('\nRESULT: ', result, '\n')
 
-    if result['score'] >= 0.5:
+    if result is not None and result['score'] >= 0.5:
         db.Reply.objects.create(
             thread_threadid = thread,
             creationdate=datetime.now(),
