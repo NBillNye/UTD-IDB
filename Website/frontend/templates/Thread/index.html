@@ -56,30 +56,37 @@
             {% for reply in thread.replies %}
             <div class="item reply-item">
                 <div class="content">
-                    <div class="header">{{reply.student_netid.firstname}} {{ reply.student_netid.lastname }}</div>
+                    <div class="header">{{reply.student_netid.firstname}} {{ reply.student_netid.lastname }}</div>    
+                    <button class="ui delete icon button" id="{{reply.replyid}}">
+                        <i class="trash alternate outline icon"></i>
+                    </button>
                     <span class="date"> ({{reply.creationdate}})</span>
                     <div class="description">
                         <p>{{reply.content}}</p>
                     </div>
                 </div>
-                <button class="ui delete icon button" id="{{reply.replyid}}">
-                    <i class="trash alternate outline icon"></i>
-                </button>
             </div>
             <div class="ui fluid ReReply action input">
                 <input name="description"></input>
                 <div class="replyRep button" id="{{reply.replyid}}"><img src="/media/Images/Reply Orig.png"></div>
             </div>
-            {% for chreply in reply.replies%}
-                    <div class="item chreply-item">
-                        <div class="content">
-                        <div class="header">{{chreply.student_netid.firstname}} {{ chreply.student_netid.lastname }}</div>
-                        <span class="date"> ({{chreply.creationdate}})</span>
-                        <div class="description">
-                            <p>{{chreply.content}}</p>
+            {% if reply.replies %}
+                <div class="ui reply container">
+                    <div class="ui divided items">
+                    {% for chreply in reply.replies%}
+                        <div class="item chreply-item">
+                            <div class="content">
+                                <div class="header">{{chreply.student_netid.firstname}} {{ chreply.student_netid.lastname }}</div>
+                                <span class="date"> ({{chreply.creationdate}})</span>
+                                <div class="description">
+                                    <p>{{chreply.content}}</p>
+                                </div>
+                            </div>
                         </div>
+                    {% endfor %}
                     </div>
-                {% endfor %}
+                </div>
+            {% endif %}
             {% endfor %}
         </div>
     </div>
@@ -169,17 +176,9 @@
         padding: 20px; 
         justify-content: space-between;
     }
-    .ui.chreply.item{
-        width: 1100px; 
-        height: 150px;
-        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5); 
-        padding: 10px; display: flex; 
-        margin-left: 405px;
-        justify-content: space-between;
-    }
-    .thread-item {
-        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
-        padding: 10px;
+
+    .thread-item, .chreply-item {
+        padding: 10px !important;
         display: flex;
         justify-content: space-between;
         border-radius: 15px;
@@ -191,9 +190,11 @@
         background-color: white !important;
         border-radius: 15px !important;
     }
+    
     .ui.reply.item + .ui.reply.item {
         margin-top: 10px;
     }
+
     .thread-date {
         font-size: 14px;
         color: #999;
@@ -206,6 +207,10 @@
     .ui.divided.items > .item:first-child  {
         padding: 10px !important;
         margin-top: 0px !important;
+    }
+
+    .ui.delete.icon.button {
+        float: right;
     }
 </style>
 

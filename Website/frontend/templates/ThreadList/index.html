@@ -58,11 +58,42 @@
             </div>
             {% endfor %}
         </div>
+        <br>
     </div>
 </body>
 </html>
 <script type="text/javascript">
     $(document).ready(function () {
+        $('#searchBox').keypress(function(event){
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13'){
+                searchQuery = $(this).val();
+                if (!searchQuery) {
+                    window.location.href = "/ThreadList";
+                } else {
+                    window.location.href = "/ThreadList/" + searchQuery;
+                }
+            }
+        });
+        $(".ui.delete.icon.button").click(function (e) {
+            e.stopPropagation();
+
+            var thid = $(this).attr('id')
+            console.log('threadid',thid)
+            var data = {"threadid": thid};
+            $.ajax({
+                url: window.location.href,
+                method: "DELETE",
+                data: JSON.stringify(data),
+                success: function(response) {
+                    console.log("Success:", response);
+                    window.location.href ='/ThreadList';
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", errorThrown);
+                }
+            });
+        });
         $(".thread-item").click(function (e) {
             window.location.href = "/Thread/" + $(this).attr('id') + '/';
         });
@@ -70,24 +101,7 @@
             window.location.href = "/CreateThread";
         });
         $("#uploadFile").click(function (e) {
-            window.location.href += "/uploadFile/";
-        });
-        $(".ui.delete.icon.button").click(function (e) {
-           var thid = $(this).attr('id')
-           console.log('threadid',thid)
-           var data = {"threadid": thid};
-           $.ajax({
-               url: window.location.href,
-               method: "DELETE",
-               data: JSON.stringify(data),
-               success: function(response) {
-                   console.log("Success:", response);
-                   window.location.href ='/ThreadList';
-               },
-               error: function(jqXHR, textStatus, errorThrown) {
-                   console.log("Error:", errorThrown);
-               }
-           });
+            window.location.href = "/uploadFile/";
         });
     });
 </script>

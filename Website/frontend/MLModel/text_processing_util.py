@@ -261,6 +261,6 @@ def del_document(class_ID: int, origin: int | str):
 if __name__ == '__main__':
 
     #new_process(12345, file_path = 'Syllabus-3377-converted.docx')
-    new_process(class_id = 12345, thread_ID=6)
+    new_process(class_ID = 24313, file_path="Syllabus-3377-converted.docx", thread_ID=49)
 
     #del_document(12345, 'Syllabus-3377-converted.docx')
