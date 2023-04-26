@@ -6,20 +6,23 @@
     <div>
         <div class="ui orange inverted menu">
             <div class="ui container">
-                <div class="item">
-                    <div class="ui icon input">
-                        <input class="prompt" id="searchBox" type="text" placeholder="Search...">
-                        <i class="search icon"></i>
+                <div class="left menu">
+                    <div class="item">
+                        <img src="/media/Images/Logo orange.png">
+                    </div>        
+                    <div class="item">
+                        <div class="ui icon input">
+                            <input class="prompt" id="searchBox" type="text" placeholder="Search...">
+                            <i class="search icon"></i>
+                        </div>
                     </div>
                 </div>
                 <div class="right menu">
                     <div class="item">
-                        <button class="ui orange button" id="addThread">Add Thread</button>
-                    </div>
-                </div>
-                <div class="menu">
-                    <div class="item">
                         <button class="ui orange button" id="uploadFile">Upload File</button>
+                    </div>
+                    <div class="item">
+                        <input type="image" class="ubtn" id="addThread" src="/media/Images/Thread Button.png" width="80" height="40"></a>
                     </div>
                 </div>
             </div>
@@ -99,6 +102,10 @@
     });
 </script>
 <style>
+    .threadimg {
+        width: 112.86px;
+        height: 18px;
+    }      
     .thread-item {
         box-shadow: 0px 0px 4px 6px rgba(0, 0, 0, .2) !important;
         padding: 10px !important;
