@@ -7,7 +7,12 @@
         <div class="ui orange inverted menu">
             <div class="ui container">
                 <div class="item">
-                    <button class="ui white button" id="backButton">< Back</button>
+                    <button class="ui white button" id="backButton"> Back</button>
+                </div>
+                <div class="left menu">
+                    <div class="item">
+                        <img src="/media/Images/Logo orange.png">
+                    </div>
                 </div>
             </div>
         </div>
@@ -31,7 +36,7 @@
     </div>
     <div class="ui fluid reply action input" id="reply">
         <input name="description"></input>
-        <div class="ui button" id="replyButton">Reply</div>
+        <div class="ui btn" id="replyButton"><img src="/media/Images/Reply Orig.png"></div>
     </div>
     {% if thread.replies %}
     <div class="ui reply container">
@@ -51,7 +56,7 @@
             </div>
             <div class="ui fluid ReReply action input">
                 <input name="description"></input>
-                <div class="ui replyRep button" id="{{reply.replyid}}">Reply to this</div>
+                <div class="replyRep button" id="{{reply.replyid}}"><img src="/media/Images/Reply Orig.png"></div>
             </div>
             {% for chreply in reply.replies%}
                     <div class="item chreply-item">
@@ -111,7 +116,7 @@
                 }
             });
         })
-        $(".ui.replyRep.button").click(function () {
+        $(".replyRep.button").click(function () {
             var replyid = $(this).attr('id')
             console.log('repid',replyid)
             var desc = $(".ui.fluid.ReReply.action.input").find('input[name="description"]').val();
