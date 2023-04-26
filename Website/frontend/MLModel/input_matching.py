@@ -7,8 +7,8 @@ import spacy
 import pickle
 import os
 
-import keyword_extraction
-from pipeline import *
+from . import keyword_extraction
+from . import pipeline
 import time
 
 class Doc:
@@ -136,8 +136,9 @@ def query_model_detailed(new_query: Inputs):
     query_keywords = new_query.get_query_keywords()
    
     # get processed documents list corresponding to class ID
-    class_processed_documents_path = 'class_data/' + str(new_query.class_ID) + '.pickle' # TENTATIVE
-    try: 
+    class_processed_documents_path = 'frontend/MLModel/class_data/' + str(new_query.class_ID) + '.pickle' # TENTATIVE
+    try:
+        print("Path: " + str(os.getcwd()) + class_processed_documents_path)
         if os.stat(class_processed_documents_path).st_size > 0:
             with open(class_processed_documents_path, 'rb') as file:
                 # list of processed Doc objects of one class

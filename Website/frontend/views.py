@@ -6,8 +6,7 @@ import requests
 from decouple import config
 from . import models as db
 from datetime import datetime
-from .MLModel.text_extractor_docx import ask_bert
-import os
+from .MLModel.input_matching import query_model
 from django.views.generic import TemplateView
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
@@ -15,36 +14,34 @@ from django.conf.urls.static import static
 # Create your views here.
 
 @csrf_exempt
-def ThreadList(request, classId = -1):
+def ThreadList(request, classId = -1, filter = ''):
     if request.method == "DELETE":
         data = json.loads(request.body)
         db.Reply.objects.filter(thread_threadid = data["threadid"]).delete()
         db.Thread.objects.filter(threadid=data["threadid"]).delete()
         return JsonResponse(classId, safe=False)
     else:
+        threads = []
         if classId == -1:
-            threads = db.Thread.objects.all().order_by("-creationdate")
-            
-            class_id = request.session["class_id"]
-            class_name = "Class"
-            if class_id is not None:
-                threads = threads.filter(class_classid = class_id)
-                class_name = db.Class.objects.filter(classid = class_id).first().classname
-            if threads is not None:
-                return render(request, 'ThreadList/index.html', {"class_name": class_name, "threads": threads})         
+            classId = request.session["class_id"]
         else:
             request.session["class_id"] = classId
+            return redirect("ThreadList")
+        
+        threads = db.Thread.objects.filter(class_classid = classId).order_by("-creationdate")
 
-            threads = db.Thread.objects.filter(class_classid = classId)
-            class_name = db.Class.objects.filter(classid = classId).first().classname
+        if filter:
+            threads = threads.filter(threadcontent__icontains=filter)
 
-            if threads is not None:
-                return render(request, 'ThreadList/index.html', {"class_name": class_name, "threads": threads})         
+        class_name = db.Class.objects.filter(classid = classId).first().classname
+
+        if threads is not None:
+            return render(request, 'ThreadList/index.html', {"class_name": class_name, "threads": threads})         
 
 
 
 @csrf_exempt
-def Thread(request, thread_id=-1, Delete = '' ):
+def Thread(request, thread_id=-1, Delete = ''):
     if request.method == "POST":
         # Create Thread
 
@@ -81,7 +78,7 @@ def Thread(request, thread_id=-1, Delete = '' ):
                 thread.replies = db.Reply.objects.filter(thread_threadid=thread_id).filter(parent_replyid__isnull =True).order_by("-creationdate")
                 for i in thread.replies:
                     repid = i.replyid
-                    i.replies = db.Reply.objects.filter(thread_threadid=thread_id).filter(parent_replyid = repid).order_by("-creationdate")
+                    i.replies = db.Reply.objects.filter(thread_threadid=thread_id).filter(parent_replyid = repid).order_by("creationdate")
                 return render(request, 'Thread/index.html', {"thread": thread})
             
 
@@ -118,10 +115,61 @@ def CreateThread(request):
                                              creationdate=datetime.now(),
                                              student_netid=studentObj)
         
-        __AskBert(data["description"], newThread)
+        __QueryModel(request, data["description"], newThread)
         
         return JsonResponse(newThread.threadid, safe=False)
     return render(request, "CreateThread/index.html", {})
+
+
+def __QueryModel(request, query, thread):
+    class_id = request.session["class_id"]
+
+    if class_id is None:
+        return
+
+    result = query_model(class_id, query)
+
+    botStudentObj = db.Student.objects.filter(netid = "bot000001").first()
+    
+    thread_list, doc_list = result
+
+    thread_list = [*set(thread_list)]
+    doc_list = [*set(doc_list)]
+
+    print("Thread_List", thread_list)
+    print("Doc", doc_list)
+
+    reply = ""
+
+    if thread_list:
+        if len(reply) > 1:
+            reply += "These threads may help you: " 
+        else:
+            reply += "This thread may help you: " 
+        for thr in thread_list:
+            # Temporary. Will replace with hyperlinks.
+            reply += "\n\t" + str(thr)
+
+    if doc_list:
+        if reply:
+            reply += "\n"
+
+        if len(doc_list) > 1:
+            reply += "These documents may help you: " 
+        else:
+            reply += "This document may help you: " 
+        for doc in doc_list:
+            # Temporary. Will replace with hyperlinks.
+            reply += "\n\t" + str(doc)
+            
+
+    if reply:
+        db.Reply.objects.create(
+            thread_threadid = thread,
+            creationdate=datetime.now(),
+            content=reply,
+            student_netid = botStudentObj
+        )
 
 def LoginUser(request, net_id):
     student = db.Student.objects.filter(netid = net_id).first()
@@ -133,23 +181,8 @@ def LoginUser(request, net_id):
     request.session["net_id"] = net_id
     request.session["class_id"] = enrollment.class_classid.classid
 
-    return redirect('ThreadList')
+    return redirect('Classes')
 
-
-def __AskBert(query, thread):
-    result = ask_bert('Syllabus-3377-converted.docx', query)
-
-    botStudentObj = db.Student.objects.filter(netid = "bot000001").first()
-    
-    print('\nRESULT: ', result, '\n')
-
-    if result is not None and result['score'] >= 0.5:
-        db.Reply.objects.create(
-            thread_threadid = thread,
-            creationdate=datetime.now(),
-            content=result["answer"],
-            student_netid = botStudentObj
-        )
 @csrf_exempt
 def uploadFile(request,classId = -1):
     if request.method == "POST":
