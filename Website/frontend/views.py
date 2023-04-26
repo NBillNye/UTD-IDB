@@ -86,9 +86,23 @@ def Thread(request, thread_id=-1, Delete = ''):
 
 def Classes(request, classNum = ''):
     if classNum == '':
-       classesL = db.Class.objects.all()
-       if classesL is not None:
-        return render(request, 'Classes/index.html', {"Classes": classesL}) 
+        classesL = db.Class.objects.all()
+        netid = request.session["net_id"]
+        classFilter = []
+       
+        # Only grab student's enrolled classes
+        if netid:
+            studentObj = db.Student.objects.filter(netid = netid).first()
+            if studentObj:
+                studentClasses = db.Enrollment.objects.filter(student_netid = studentObj)
+                for c in studentClasses:
+                    classFilter.append(c.class_classid.classid)
+
+        if classFilter:
+            classesL = classesL.filter(classid__in=classFilter)
+    
+        if classesL is not None:
+            return render(request, 'Classes/index.html', {"Classes": classesL}) 
     else:
         classesL = db.Class.objects.filter(classnumber = classNum)
         if classesL is not None:
