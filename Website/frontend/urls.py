@@ -11,6 +11,7 @@ urlpatterns = [
     path("Classes/<classNum>",views.Classes,name='ClassSearch'),
     path("CreateThread", views.CreateThread),
     path("<int:classId>/ThreadList/uploadFile/", views.uploadFile,name="uploadFile"),
-    path("<int:classId>/uploadFile", views.uploadFile,name="uploadFile")
+    path("<int:classId>/uploadFile", views.uploadFile,name="uploadFile"),
+    path("LoginUser/<net_id>", views.LoginUser),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

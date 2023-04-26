@@ -13,7 +13,7 @@
                 </div>
                 <div class="item">
                     <div class="ui icon input">
-                        <input class="prompt" type="text" placeholder="Search...">
+                        <input class="prompt" id="searchBox" type="text" placeholder="Search...">
                         <i class="search icon"></i>
                     </div>
                 </div>
@@ -34,23 +34,28 @@
     </div>
     <br>
     <div class="ui thread container">
+        <div class="ui header">
+            <h2>{{class_name}}</h2>
+        </div>
         <div class="ui divided items">
             {% for thread in threads %}
             <div class="item thread-item" id="{{thread.pk}}">
                 <div class="content">
                     <a class="header">{{ thread.threadtitle }}</a>
                     <span class="date"> ({{ thread.creationdate }})</span>
+                    <span>
+                        <button class="ui delete icon button" id="{{thread.threadid}}">
+                            <i class="trash alternate outline icon"></i>
+                        </button></span>
                     <div class="meta">
                         <span>Written by {{ thread.student_netid.firstname }} {{ thread.student_netid.lastname }}</span>
                     </div>
                     <div class="description">
                         <p>{{ thread.threadcontent|truncatewords:30 }}</p>
                     </div>
+                    
                 </div>
             </div>
-            <button class="ui delete icon button" id="{{thread.threadid}}">
-                <i class="trash alternate outline icon"></i>
-            </button>
             {% endfor %}
         </div>
     </div>
@@ -91,23 +96,35 @@
         width: 112.86px;
         height: 18px;
     }      
-    .thread {
-        cursor: pointer;
-    }
     .thread-item {
-        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1);
-        padding: 10px;
-        display: flex;
-        justify-content: space-between;
+        box-shadow: 0px 0px 4px 6px rgba(0, 0, 0, .2) !important;
+        padding: 10px !important;
+        margin: 20px 0px 20px 0px !important;
+        background-color: white !important;
+        cursor: pointer;
+        border-radius: 15px !important;
     }
-    
-    .thread-item + .thread-item {
-        margin-top: 10px;
+
+    .ui.divided.items > .item:first-child  {
+        padding: 10px !important;
+        margin-top: 0px !important;
+    }
+
+    .ui.thread.container {
+        margin-left: 21% !important;
+    }
+
+    body {
+        background-color: #D1D1D1;
     }
 
     .thread-date {
         font-size: 14px;
         color: #999;
+    }
+
+    .ui.delete.icon.button {
+        float: right;
     }
 </style>
 

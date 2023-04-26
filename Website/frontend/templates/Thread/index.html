@@ -27,10 +27,18 @@
                     <div class="meta">
                         <span>Written by {{ thread.student_netid.firstname }} {{ thread.student_netid.lastname }}</span>
                     </div>
-                    <div class="description">
+                    <div class="description thread-desc">
                         <p>{{ thread.threadcontent }}</p>
                     </div>
+                    <br>
+                    <div class="ui fluid reply action input" id="reply">
+                        <input name="description"></input>
+                        <div class="ui button" id="replyButton">Reply</div>
+                    </div>
                 </div>
+            </div>
+            <div class="item">
+                
             </div>
         </div>
     </div>
@@ -39,7 +47,11 @@
         <div class="ui btn" id="replyButton"><img src="/media/Images/Reply Orig.png"></div>
     </div>
     {% if thread.replies %}
+    <br>
     <div class="ui reply container">
+        <div class="ui header">
+            <h3>Replies:</h4>
+        </div>
         <div class="ui divided items">
             {% for reply in thread.replies %}
             <div class="item reply-item">
@@ -138,19 +150,23 @@
     });
 </script>
 <style>
+    body {
+        background-color: #D1D1D1;
+    }
+
     .ui.thread.container{
+        box-shadow: 0px 0px 4px 6px rgba(0, 0, 0, .2) !important;
+        background-color: white;
         width: 1130px; 
-        height: 150px;
-        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5); 
-        padding: 10px; display: flex; 
+        padding: 10px; 
         justify-content: space-between;
+        border-radius: 15px;
     }
     
     .ui.reply.container{
-        width: 1130px; 
-        height: 150px;
-        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5); 
-        padding: 10px; display: flex; 
+        background-color: white;
+        width: 1130px;
+        padding: 20px; 
         justify-content: space-between;
     }
     .ui.chreply.item{
@@ -166,10 +182,14 @@
         padding: 10px;
         display: flex;
         justify-content: space-between;
+        border-radius: 15px;
     }
-    
-    .thread-item + .thread-item {
-        margin-top: 10px;
+
+    .reply-item {
+        padding: 10px !important;
+        margin: 20px 0px 20px 0px !important;
+        background-color: white !important;
+        border-radius: 15px !important;
     }
     .ui.reply.item + .ui.reply.item {
         margin-top: 10px;
@@ -178,11 +198,14 @@
         font-size: 14px;
         color: #999;
     }
-    .ui.fluid.reply.action.input {
-        margin-left: 385px;
-        padding: 10px; display: flex;
-        width: 1150px; 
-        justify-content: space-between;
+
+    .thread-desc {
+        padding-top: 10px;
+    }
+
+    .ui.divided.items > .item:first-child  {
+        padding: 10px !important;
+        margin-top: 0px !important;
     }
 </style>
 
