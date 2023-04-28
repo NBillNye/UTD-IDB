@@ -11,23 +11,27 @@
                         <img src="/media/Images/Logo orange.png">
                     </div>        
                     <div class="item">
+                        <button class="ui white button" id="backButton"> Back</button>
+                    </div>
+                </div>
+
+                <div class="ui orange inverted center menu">
+                    <div class="item">
                         <div class="ui icon input">
                             <input class="prompt" id="searchBox" type="text" placeholder="Search...">
                             <i class="search icon"></i>
                         </div>
                     </div>
                 </div>
-
                 <div class="right menu">
-                    <div class="item">
+                    {% if user.is_authenticated %}
+                    
+                    {% comment %} <div class="item">
                         <button class="ui orange button" id="uploadFile">Upload File</button>
-                    </div>
+                    </div> {% endcomment %}
                     <div class="item">
                         <input type="image" class="ubtn" id="addThread" src="/media/Images/Thread Button.png" width="80" height="40"></a>
                     </div>
-                </div>
-                <div class="right menu">
-                    {% if user.is_authenticated %}
                     <div class="item">
                             <button class="ui orange button" id="logoutb">Logout</button>
                     </div>
@@ -90,6 +94,9 @@
             on: false
           }).dimmer('toggle');
 
+        $("#backButton").click(function() {
+            window.location.href = "/Classes";
+        })
         $('#searchBox').keypress(function(event){
             var keycode = (event.keyCode ? event.keyCode : event.which);
             if(keycode == '13'){
@@ -176,10 +183,6 @@
     .ui.divided.items > .item:first-child  {
         padding: 10px !important;
         margin-top: 0px !important;
-    }
-
-    .ui.thread.container {
-        margin-left: 21% !important;
     }
 
     body {
