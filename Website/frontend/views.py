@@ -183,6 +183,13 @@ def signup(request):
         student.save()
         messages.success(request, "Your account has been successfully created!")
 
+        # Add user to UNIX class
+        classes = db.Class.objects.values('classid').distinct()
+        for c in classes:
+            unixClass = db.Class.objects.filter(classid = c["classid"]).first()
+            enrollment = db.Enrollment(student_netid=student, class_classid=unixClass)
+            enrollment.save()
+
         return redirect('login')
     return render(request, "Signup/index.html", {})
 
