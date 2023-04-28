@@ -48,7 +48,7 @@ class Professor(models.Model):
     firstname = models.CharField(db_column='FirstName', max_length=15)  # Field name made lowercase.
     lastname = models.CharField(db_column='LastName', max_length=15)  # Field name made lowercase.
     email = models.CharField(max_length=45)
-    password = models.CharField(db_column='Password', max_length=18, blank=True, null=True)  # Field name made lowercase.
+    password = models.CharField(db_column='Password', max_length=64, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -61,7 +61,7 @@ class Reply(models.Model):
     content = models.TextField(db_column='Content')  # Field name made lowercase.
     student_netid = models.ForeignKey('Student', models.DO_NOTHING, db_column='Student_NetID')  # Field name made lowercase.
     replyid = models.AutoField(db_column='ReplyID', primary_key=True)  # Field name made lowercase.
-    parent_replyid = models.IntegerField(db_column='Parent_ReplyID')
+    parent_replyid = models.BigIntegerField(db_column='Parent_ReplyID', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -73,9 +73,9 @@ class Student(models.Model):
     netid = models.CharField(db_column='NetID', primary_key=True, max_length=11)  # Field name made lowercase.
     firstname = models.CharField(db_column='FirstName', max_length=15)  # Field name made lowercase.
     lastname = models.CharField(db_column='LastName', max_length=15)  # Field name made lowercase.
-    email = models.CharField(max_length=50)
-    password = models.CharField(db_column='Password', max_length=20, blank=True, null=True)  # Field name made lowercase.
-        
+    email = models.CharField(max_length=45)
+    password = models.CharField(db_column='Password', max_length=64, blank=True, null=True)  # Field name made lowercase.
+
     class Meta:
         managed = False
         db_table = 'Student'
@@ -88,7 +88,19 @@ class Thread(models.Model):
     threadcontent = models.TextField(db_column='ThreadContent')  # Field name made lowercase.
     student_netid = models.ForeignKey(Student, models.DO_NOTHING, db_column='Student_NetID')  # Field name made lowercase.
     threadtitle = models.CharField(db_column='ThreadTitle', max_length=45)  # Field name made lowercase.
+    bot_view = models.BooleanField(db_column="bot_view")
 
     class Meta:
         managed = False
         db_table = 'Thread'
+
+
+class Threadviews(models.Model):
+    idthreadviews = models.AutoField(db_column='idThreadViews', primary_key=True)  # Field name made lowercase.
+    student_netid = models.ForeignKey(Student, models.DO_NOTHING, db_column='student_netid', blank=True, null=True)
+    thread = models.ForeignKey(Thread, models.DO_NOTHING)
+    professor_netid = models.ForeignKey(Professor, models.DO_NOTHING, db_column='professor_netid', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'ThreadViews'
