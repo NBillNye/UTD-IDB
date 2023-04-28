@@ -62,8 +62,8 @@ def Thread(request, thread_id=-1, Delete = ''):
         if data["repid"] == -1:
             print(data["description"])
             threadObj = db.Thread.objects.filter(threadid=thread_id).first()
-            classObj = db.Class.objects.filter(classid=24313).first()
-            studentObj = db.Student.objects.filter(netid="abc123000").first()
+            netid = request.session["net_id"]
+            studentObj = db.Student.objects.filter(netid=netid).first()
             newReply = db.Reply.objects.create(thread_threadid = threadObj,
                                             creationdate = datetime.now(),
                                             content = data["description"],
@@ -71,8 +71,8 @@ def Thread(request, thread_id=-1, Delete = ''):
         else:
             print(data["description"])
             threadObj = db.Thread.objects.filter(threadid=thread_id).first()
-            classObj = db.Class.objects.filter(classid=24313).first()
-            studentObj = db.Student.objects.filter(netid="abc123000").first()
+            netid = request.session["net_id"]
+            studentObj = db.Student.objects.filter(netid=netid).first()
             newReply = db.Reply.objects.create(thread_threadid = threadObj,
                                             creationdate = datetime.now(),
                                             content = data["description"],
