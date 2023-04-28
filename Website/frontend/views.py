@@ -176,6 +176,7 @@ def login(request):
 def logout (request):
     auth_logout(request)
     messages.success(request, "Logged out successfully...")
+    request.session.clear()
     return redirect('login')
 
 def LoginUser(request, net_id):
