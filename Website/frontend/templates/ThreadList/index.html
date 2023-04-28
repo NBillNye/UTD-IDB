@@ -12,6 +12,16 @@
                         <i class="search icon"></i>
                     </div>
                 </div>
+                <div class="result">
+                    {% if user.is_authenticated %}
+                    <div class="right menu">
+                        <div class="ui item">
+                            Hello {{  user.first_name}} {{ user.last_name }}
+                        </div>
+                    </div>
+
+                    {% endif %}
+                </div>
                 <div class="right menu">
                     <div class="item">
                         <button class="ui orange button" id="addThread">Add Thread</button>
@@ -21,6 +31,14 @@
                     <div class="item">
                         <button class="ui orange button" id="uploadFile">Upload File</button>
                     </div>
+                </div>
+                <div class="result">
+                    {% if user.is_authenticated %}
+                    <div class="item">
+                            <button class="ui orange button" id="logoutb">Logout</button>
+                    </div>
+
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -64,6 +82,9 @@
         });
         $("#uploadFile").click(function (e) {
             window.location.href += "/uploadFile/";
+        });
+        $("#logoutb").click(function (e) {
+            window.location.href = "/login";
         });
         $(".ui.delete.icon.button").click(function (e) {
            var thid = $(this).attr('id')
