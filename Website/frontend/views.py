@@ -11,6 +11,10 @@ from django.views.generic import TemplateView
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import messages
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
 # Create your views here.
 
 @csrf_exempt
@@ -159,12 +163,65 @@ def CreateThread(request):
         return JsonResponse(newThread.threadid, safe=False)
     return render(request, "CreateThread/index.html", {})
 
+def signup(request):
+    if request.method == 'POST':
+        netid = request.POST.get('netid')
+        firstname = request.POST.get('firstname')
+        lastname = request.POST.get('lastname')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+
+        myuser = User.objects.create_user(netid, email, password)
+        myuser.first_name = firstname
+        myuser.last_name = lastname
+        myuser.save()
+
+        password_hash = make_password(password[:30])
+        password_hash = password_hash[:30]
+        student = db.Student(permissions=0, netid=netid, firstname=firstname, lastname=lastname, email=email, password=password_hash)
+        student.save()
+        messages.success(request, "Your account has been successfully created!")
+
+        return redirect('login')
+    return render(request, "Signup/index.html", {})
+
+def login(request):
+    if request.method == 'POST':
+        username = request.POST.get('netid')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            auth_login(request, user)
+            student = db.Student.objects.filter(netid = username).first()
+            enrollment = db.Enrollment.objects.filter(student_netid = student).first()
+            request.session["net_id"] = username
+            return redirect('Classes')
+
+
+        else:
+            messages.error(request, "Invalid Login")
+            return redirect('login')
+    
+    else:
+        return render(request, 'Login/index.html', {})
+
+
+
+def logout (request):
+    auth_logout(request)
+    messages.success(request, "Logged out successfully...")
+    request.session.clear()
+    return redirect('login')
+
 
 def __QueryModel(request, query, thread):
     class_id = request.session["class_id"]
 
     if class_id is None:
         return
+
 
     result = query_model(class_id, query)
 

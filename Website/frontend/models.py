@@ -69,7 +69,7 @@ class Reply(models.Model):
 
 
 class Student(models.Model):
-    permissions = models.IntegerField(db_column='Permissions')  # Field name made lowercase.
+    permissions = models.IntegerField(db_column='Permissions', null=True)  # Field name made lowercase.
     netid = models.CharField(db_column='NetID', primary_key=True, max_length=11)  # Field name made lowercase.
     firstname = models.CharField(db_column='FirstName', max_length=15)  # Field name made lowercase.
     lastname = models.CharField(db_column='LastName', max_length=15)  # Field name made lowercase.

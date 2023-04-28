@@ -1,0 +1,86 @@
+{% extends 'Shared/SharedView.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+    <style>
+      body {
+        background-color: #f47616;
+      }
+      form {
+        background-color: #FFFFFF;
+        border-radius: 5px;
+        padding: 20px;
+        margin: 0 auto;
+        width: 300px;
+        text-align: center;
+      }
+      input[type=text], input[type=password] {
+        width: 100%;
+        padding: 12px 15px;
+        margin:8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      input[type=text], input[type=email]
+      {
+        width: 100%;
+        padding: 12px 15px;
+        margin:8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      a {
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <form method="POST">
+      {% csrf_token %}
+      <h2>Create Your Account</h2>
+
+    <label for="">First name:</label>
+    <input type="text" name="firstname" id="firstname" required><br>
+
+    <label for="">Last name:</label>
+    <input type="text" name="lastname" id="lastname" required><br>
+
+    <label for="">Username:</label>
+    <input type="text" name="netid" id="netid" required><br>
+
+    <label for="">Password:</label>
+    <input type="password" name="password" id="password" required><br>
+
+    <label for="">Confirm Password:</label>
+    <input type="password" name="password2" id="password2" required><br>
+
+    <label for="">Email:</label>
+    <input type="email" name="email" id="email"><br>
+
+
+    <button type="submit">Sign up</button>
+    <button type="button"> <a href="/login"> Go Back</a></button>
+    </form>
+  </body>
+</html>
+{% endblock %}

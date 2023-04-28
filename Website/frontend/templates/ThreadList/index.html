@@ -17,6 +17,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="right menu">
                     <div class="item">
                         <button class="ui orange button" id="uploadFile">Upload File</button>
@@ -24,6 +25,14 @@
                     <div class="item">
                         <input type="image" class="ubtn" id="addThread" src="/media/Images/Thread Button.png" width="80" height="40"></a>
                     </div>
+                </div>
+                <div class="right menu">
+                    {% if user.is_authenticated %}
+                    <div class="item">
+                            <button class="ui orange button" id="logoutb">Logout</button>
+                    </div>
+
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -118,6 +127,27 @@
             window.location.href = "/CreateThread";
         });
         $("#uploadFile").click(function (e) {
+            window.location.href += "/uploadFile/";
+        });
+        $("#logoutb").click(function (e) {
+            window.location.href = "/login";
+        });
+        $(".ui.delete.icon.button").click(function (e) {
+           var thid = $(this).attr('id')
+           console.log('threadid',thid)
+           var data = {"threadid": thid};
+           $.ajax({
+               url: window.location.href,
+               method: "DELETE",
+               data: JSON.stringify(data),
+               success: function(response) {
+                   console.log("Success:", response);
+                   window.location.href ='/ThreadList';
+               },
+               error: function(jqXHR, textStatus, errorThrown) {
+                   console.log("Error:", errorThrown);
+               }
+           });
             window.location.href = "/uploadFile/";
         });
     });
