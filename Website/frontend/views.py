@@ -17,6 +17,7 @@ from django.conf.urls.static import static
 def ThreadList(request, classId = -1, filter = ''):
     if request.method == "DELETE":
         data = json.loads(request.body)
+        db.Threadviews.objects.filter(thread = data["threadid"]).delete()
         db.Reply.objects.filter(thread_threadid = data["threadid"]).delete()
         db.Thread.objects.filter(threadid=data["threadid"]).delete()
         return JsonResponse(classId, safe=False)
@@ -29,6 +30,14 @@ def ThreadList(request, classId = -1, filter = ''):
             return redirect("ThreadList")
         
         threads = db.Thread.objects.filter(class_classid = classId).order_by("-creationdate")
+        readThreads = []
+
+        for thread in threads:            
+            threadView = db.Threadviews.objects.filter(thread = thread).filter(student_netid__netid = request.session["net_id"]).first()
+
+            if threadView or thread.bot_view:
+                threads = threads.exclude(threadid = thread.threadid)
+                readThreads.append(thread)
 
         if filter:
             threads = threads.filter(threadcontent__icontains=filter)
@@ -36,7 +45,7 @@ def ThreadList(request, classId = -1, filter = ''):
         class_name = db.Class.objects.filter(classid = classId).first().classname
 
         if threads is not None:
-            return render(request, 'ThreadList/index.html', {"class_name": class_name, "threads": threads})         
+            return render(request, 'ThreadList/index.html', {"class_name": class_name, "threads": threads, "readThreads": readThreads})         
 
 
 
@@ -75,6 +84,18 @@ def Thread(request, thread_id=-1, Delete = ''):
         if thread_id != -1:
             thread = db.Thread.objects.filter(threadid = thread_id).first()
             if thread is not None:
+                netid = request.session["net_id"]
+                studentObj = db.Student.objects.filter(netid = netid).first()
+                
+                threadView = db.Threadviews.objects.filter(student_netid = studentObj).filter(thread = thread).first()
+
+                if not threadView:
+                    threadView = db.Threadviews.objects.create(
+                        student_netid = studentObj,
+                        thread = thread,
+                        professor_netid = None
+                    )
+
                 thread.replies = db.Reply.objects.filter(thread_threadid=thread_id).filter(parent_replyid__isnull =True).order_by("-creationdate")
                 for i in thread.replies:
                     repid = i.replyid
@@ -95,8 +116,12 @@ def Classes(request, classNum = ''):
             studentObj = db.Student.objects.filter(netid = netid).first()
             if studentObj:
                 studentClasses = db.Enrollment.objects.filter(student_netid = studentObj)
-                for c in studentClasses:
-                    classFilter.append(c.class_classid.classid)
+                if studentClasses:
+                    for c in studentClasses:
+                        classFilter.append(c.class_classid.classid)
+                else:
+                    classesL = []
+
 
         if classFilter:
             classesL = classesL.filter(classid__in=classFilter)
@@ -178,22 +203,23 @@ def __QueryModel(request, query, thread):
             
 
     if reply:
+        thread.bot_view = True
+        thread.save()
+
         db.Reply.objects.create(
             thread_threadid = thread,
             creationdate=datetime.now(),
             content=reply,
             student_netid = botStudentObj
         )
+    else:
+        thread.bot_view = False
+        thread.save()
 
 def LoginUser(request, net_id):
-    student = db.Student.objects.filter(netid = net_id).first()
-    # For testing at the moment, just grab the first class they're enrolled in
-    enrollment = db.Enrollment.objects.filter(student_netid = student).first()
-    
     # set session information
     request.session.clear()
     request.session["net_id"] = net_id
-    request.session["class_id"] = enrollment.class_classid.classid
 
     return redirect('Classes')
 

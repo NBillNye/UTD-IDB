@@ -49,7 +49,24 @@
                     <div class="description">
                         <p>{{ thread.threadcontent|truncatewords:30 }}</p>
                     </div>
-                    
+                </div>
+            </div>
+            {% endfor %}
+            {% for thread in readThreads %}
+            <div class="item read thread-item" id="{{thread.pk}}">
+                <div class="content">
+                    <a class="header">{{ thread.threadtitle }}</a>
+                    <span class="date"> ({{ thread.creationdate }})</span>
+                    <span>
+                        <button class="ui delete icon button" id="{{thread.threadid}}">
+                            <i class="trash alternate outline icon"></i>
+                        </button></span>
+                    <div class="meta">
+                        <span>Written by {{ thread.student_netid.firstname }} {{ thread.student_netid.lastname }}</span>
+                    </div>
+                    <div class="description">
+                        <p>{{ thread.threadcontent|truncatewords:30 }}</p>
+                    </div>
                 </div>
             </div>
             {% endfor %}
@@ -60,6 +77,10 @@
 </html>
 <script type="text/javascript">
     $(document).ready(function () {
+        $(".read").dimmer({
+            on: false
+          }).dimmer('toggle');
+
         $('#searchBox').keypress(function(event){
             var keycode = (event.keyCode ? event.keyCode : event.which);
             if(keycode == '13'){
@@ -105,7 +126,8 @@
     .threadimg {
         width: 112.86px;
         height: 18px;
-    }      
+    } 
+
     .thread-item {
         box-shadow: 0px 0px 4px 6px rgba(0, 0, 0, .2) !important;
         padding: 10px !important;
@@ -115,6 +137,12 @@
         border-radius: 15px !important;
     }
 
+    .ui.divided.items > .item:first-child  {
+        padding: 10px !important;
+        margin-top: 0px !important;
+    }
+
+    
     .ui.divided.items > .item:first-child  {
         padding: 10px !important;
         margin-top: 0px !important;
@@ -135,6 +163,10 @@
 
     .ui.delete.icon.button {
         float: right;
+    }
+
+    .ui.dimmer {
+        opacity: 20% !important;
     }
 </style>
 
