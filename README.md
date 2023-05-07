@@ -19,11 +19,11 @@ pip install -r requirements.txt
 
 ### Usage
 
-* To run the website, navigate to the Website folder which contains the manage.py file. Then, run the following command:
+To run the website, navigate to the Website folder which contains the manage.py file. Then, run the following command:
 ```
 python manage.py runserver
 ```
-* This will run the server locally on port 8000. To access the website, navigate to localhost:8000 in a web browser.
+This will run the server locally on port 8000. To access the website, navigate to localhost:8000 in a web browser.
 
 ## Authors
 
