@@ -38,7 +38,7 @@ Manuel Fernandez
 Nabil Habibi
 [@NBillNye](https://github.com/NBillNye)
 
-Sarah Liang  
+Sarah Liang
 [@Lia-Sar](https://github.com/Lia-Sar)
 
 Austin Newman
