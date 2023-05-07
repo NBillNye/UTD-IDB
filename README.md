@@ -4,19 +4,20 @@ A Natural Language Processing Model assisted Discussion Board.
 
 ## Description
 
+This is an Inteligent Discussion Board that uses Natural Language Processing (NLP). The project utilizes a Django framework for the front-end/website, and Python dependencies such as Huggingface's KeyBERT to aid in processing course documents and threads for keywords. Those keywords are then used by the Intelligent Bot to automatically respond to threads created by students. This project was created for the University of Texas at Dallas Senior Design Course (CS 4396).
+
 ## Getting Started
 
 ### Dependencies
 
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
+* All dependencies are listed in requirements.txt
+* Dependencies can by installed by running
 
-### Installing
+```bash
+pip install -r requirements.txt
+```
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
-
-### Executing program
+### Usage
 
 * How to run the program
 * Step-by-step bullets
@@ -24,20 +25,28 @@ A Natural Language Processing Model assisted Discussion Board.
 code blocks for commands
 ```
 
-## Help
-
-Any advise for common problems or issues.
-```
-command to run if program contains helper info
-```
-
 ## Authors
 
 Contributors names and contact info
 
-ex. Dominique Pizzie  
-ex. [@DomPizzie](https://twitter.com/dompizzie)
+Kyle Chan
+[@KaeCan](https://github.com/KaeCan)
+
+Manuel Fernandez
+[@Kotadis](https://github.com/kotadis)
+
+Nabil Habibi
+[@NBillNye](https://github.com/NBillNye)
+
+Sarah Liang  
+[@Lia-Sar](https://github.com/Lia-Sar)
+
+Austin Newman
+[@ANpotatobot](https://github.com/ANpotatobot)
+
+Ryan Talbot
+[@RTalbot1](https://github.com/RTalbot1)
 
 ## License
 
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+This project is licensed under the MIT License - see the LICENSE.md file for details
